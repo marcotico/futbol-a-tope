@@ -1,0 +1,1054 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fútbol a Tope</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,600;0,700;0,800;1,800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#F6DED3; --card:#FBEEE8; --ink:#1C1A1D; --muted:#7A5850; --line:#E0B2A4;
+  --red:#C4122F; --red-ink:#FFFFFF; --green:#1E6B4B; --gold:#9A6A00; --pitch:#F1CFC2;
+  --display:"Barlow Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body:"Barlow", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  color-scheme: light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#191315; --card:#241A1D; --ink:#F2E4DE; --muted:#B59A92; --line:#4B3238;
+    --red:#FF5B70; --red-ink:#1A0D10; --green:#5BC793; --gold:#E3B341; --pitch:#2A1D21;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#191315; --card:#241A1D; --ink:#F2E4DE; --muted:#B59A92; --line:#4B3238;
+  --red:#FF5B70; --red-ink:#1A0D10; --green:#5BC793; --gold:#E3B341; --pitch:#2A1D21;
+  color-scheme: dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.45 var(--body);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--red);outline-offset:2px;border-radius:4px}
+img{max-width:100%}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--paper)}
+
+/* Header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--paper);border-bottom:2px solid var(--red)}
+.top-in{max-width:1080px;margin:0 auto;padding:12px 16px 10px;display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.brand{font:italic 800 34px/1 var(--display);letter-spacing:-.5px;margin:0;color:var(--red)}
+.stamp{font-size:13px;color:var(--muted)}
+.tabs{display:flex;gap:2px;margin-left:auto}
+.tab{background:none;border:0;padding:6px 10px;font:700 17px/1 var(--display);color:var(--muted);border-radius:6px;text-transform:none}
+.tab[aria-current="page"]{color:var(--ink);background:var(--card);box-shadow:inset 0 -3px 0 var(--red)}
+.tab .ic{display:none}
+
+main{max-width:1080px;margin:0 auto;padding:18px 16px 110px}
+.view{display:none}
+.view.on{display:block}
+h2{font:800 30px/1.05 var(--display);margin:0 0 4px}
+h3{font:700 22px/1.1 var(--display);margin:28px 0 10px}
+.sub{color:var(--muted);margin:0 0 16px;max-width:62ch}
+
+/* Pills */
+.pills{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 8px;margin:0 -2px 8px;scrollbar-width:none}
+.pills::-webkit-scrollbar{display:none}
+.pill{flex:none;border:1.5px solid var(--line);background:var(--card);border-radius:999px;padding:6px 13px;font:600 15px/1.1 var(--body);white-space:nowrap}
+.pill[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+
+/* Crests */
+.crest{flex:none;display:inline-block;width:26px;height:30px;line-height:0}
+.crest svg{width:100%;height:100%;display:block;filter:drop-shadow(0 1px 1px rgba(0,0,0,.18))}
+.crest.lg{width:52px;height:60px}
+
+/* Favourites rail */
+.rail{display:flex;gap:10px;overflow-x:auto;padding:4px 2px 12px;scrollbar-width:thin}
+.rail .fav{flex:none;width:76px;display:flex;flex-direction:column;align-items:center;gap:6px;background:none;border:0;padding:6px 2px;border-radius:10px}
+.rail .fav:hover{background:var(--card)}
+.rail .fav .crest{width:44px;height:50px}
+.rail .fav span{font:600 13px/1.1 var(--body);text-align:center}
+
+/* Quiniela */
+.boleto{background:var(--card);border:2px solid var(--red);border-radius:6px;overflow:hidden}
+.boleto-head{display:grid;grid-template-columns:34px 1fr 132px;align-items:end;padding:10px 12px 6px;border-bottom:2px solid var(--red);gap:10px}
+.boleto-head b{font:800 22px/1 var(--display);color:var(--red)}
+.boleto-head .cols{display:grid;grid-template-columns:repeat(3,1fr);text-align:center;font:800 18px/1 var(--display);color:var(--red)}
+.day{padding:8px 12px 4px;font:700 15px/1 var(--display);color:var(--muted);border-top:1px solid var(--line);background:color-mix(in srgb,var(--paper) 55%,var(--card))}
+.qrow{display:grid;grid-template-columns:34px 1fr 132px;align-items:center;gap:10px;padding:8px 12px;border-top:1px dashed var(--line)}
+.day + .qrow{border-top:0}
+.qn{font:800 20px/1 var(--display);color:var(--red);text-align:right}
+.qm{min-width:0}
+.qm .teams{font-weight:600;line-height:1.25;overflow-wrap:anywhere}
+.qm .teams .is-fav{color:var(--ink)}
+.qm .teams .not-fav{color:var(--muted);font-weight:500}
+.qm .meta{font-size:13px;color:var(--muted)}
+.marks{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.mark{height:36px;border:2px solid var(--red);background:transparent;border-radius:3px;font:800 18px/1 var(--display);color:var(--red);position:relative}
+.mark[aria-pressed="true"]{background:var(--red);color:var(--red-ink)}
+.mark[aria-pressed="true"]::after{content:"";position:absolute;inset:5px;border-radius:2px;box-shadow:inset 0 0 0 1.5px var(--red-ink);opacity:.5}
+.boleto-foot{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 12px;border-top:2px solid var(--red);font-size:14px;color:var(--muted);flex-wrap:wrap}
+.linkbtn{background:none;border:0;padding:4px 0;color:var(--red);font-weight:600;text-decoration:underline;text-underline-offset:3px}
+
+/* Match list */
+.list{background:var(--card);border-radius:10px;border:1px solid var(--line);overflow:hidden}
+.m{border-top:1px solid var(--line)}
+.m:first-child{border-top:0}
+.m > summary,.m > .row{list-style:none;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:10px 12px;cursor:default}
+.m > summary{cursor:pointer}
+.m > summary::-webkit-details-marker{display:none}
+.t{display:flex;align-items:center;gap:8px;min-width:0;font-weight:500}
+.t.h{justify-content:flex-end;text-align:right}
+.t.fv{font-weight:700}
+.t.won{color:var(--ink)}
+.t .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sc{font:800 22px/1 var(--display);min-width:64px;text-align:center;font-variant-numeric:tabular-nums;padding:5px 8px;border-radius:5px;background:var(--paper)}
+.sc.pend{font:700 15px/1.1 var(--display);color:var(--muted)}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--red);flex:none}
+.goals{padding:0 14px 12px;font-size:14px;color:var(--muted);display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.goals div:first-child{text-align:right}
+.note{font-size:14px;color:var(--muted);margin:10px 2px}
+.comp-tag{font:700 12px/1 var(--body);color:var(--muted);padding:8px 12px 0}
+
+/* Tables */
+.tbl-wrap{overflow-x:auto;background:var(--card);border:1px solid var(--line);border-radius:10px}
+table{border-collapse:collapse;width:100%;min-width:520px;font-variant-numeric:tabular-nums}
+th,td{padding:8px 8px;text-align:right;white-space:nowrap}
+th{font:700 14px/1 var(--display);color:var(--muted);border-bottom:2px solid var(--line);position:sticky;top:0;background:var(--card)}
+td{border-top:1px solid var(--line)}
+th:nth-child(2),td:nth-child(2){text-align:left;width:100%}
+td:first-child{font:700 16px/1 var(--display);width:40px;border-left:4px solid transparent}
+tr.z-ucl td:first-child{border-left-color:var(--green)}
+tr.z-uel td:first-child{border-left-color:var(--gold)}
+tr.z-rel td:first-child{border-left-color:var(--red)}
+tr.mine td{background:color-mix(in srgb,var(--red) 10%,transparent);font-weight:700}
+td.pts{font:800 18px/1 var(--display)}
+.tcell{display:flex;align-items:center;gap:8px}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--muted);margin:10px 2px}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+
+/* Stats */
+.scorers{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:6px 0}
+.sr{display:grid;grid-template-columns:30px 1fr 44px;gap:10px;align-items:center;padding:7px 14px}
+.sr .pos{font:700 16px/1 var(--display);color:var(--muted);text-align:right}
+.sr .who{min-width:0}
+.sr .who b{display:block;font-weight:600}
+.sr .who small{color:var(--muted);font-size:13px}
+.bar{height:6px;border-radius:3px;background:var(--line);margin-top:5px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--muted)}
+.sr.fv .bar i{background:var(--red)}
+.sr.fv .who b{color:var(--red)}
+.sr .g{font:800 26px/1 var(--display);text-align:right;font-variant-numeric:tabular-nums}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-size:15px;margin:0 0 12px}
+.toggle input{width:18px;height:18px;accent-color:var(--red)}
+.facts{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));margin-top:14px}
+.fact{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.fact b{font:800 24px/1 var(--display);display:block}
+.fact span{font-size:14px;color:var(--muted)}
+
+/* Lineup */
+.once{display:grid;gap:18px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:900px){.once{grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr)}}
+.once-ctl{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:12px}
+.once-ctl input[type=text]{flex:1 1 200px;border:1.5px solid var(--line);background:var(--card);border-radius:8px;padding:9px 12px;font:700 20px/1 var(--display)}
+.pitch{position:relative;aspect-ratio:68/96;width:min(100%, 540px, calc(78vh * 68 / 96));margin:0 auto;background:var(--pitch);border:3px solid var(--red);border-radius:6px;overflow:hidden}
+.pitch .ln{position:absolute;border:2px solid color-mix(in srgb,var(--red) 55%,transparent)}
+.pitch .half{left:0;right:0;top:50%;height:0;border-width:2px 0 0}
+.pitch .circle{left:50%;top:50%;width:26%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%}
+.pitch .box-b{left:22%;right:22%;bottom:0;height:15%;border-bottom:0}
+.pitch .box-t{left:22%;right:22%;top:0;height:15%;border-top:0}
+.pitch .six-b{left:37%;right:37%;bottom:0;height:5.5%;border-bottom:0}
+.pitch .six-t{left:37%;right:37%;top:0;height:5.5%;border-top:0}
+.slot{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;padding:0;width:23%;max-width:110px}
+.slot .shirt{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;font:800 13px/1 var(--display);background:var(--card);border:2px dashed var(--red);color:var(--red)}
+.slot.filled .shirt{border-style:solid;background:var(--c,#555);color:#fff;border-color:var(--paper);box-shadow:0 0 0 2px var(--red)}
+.slot.filled .shirt.light{color:#1a1a1a}
+.slot .lbl{font:700 13px/1.1 var(--display);background:var(--paper);padding:3px 6px;border-radius:4px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.slot .cap{position:absolute;top:-4px;right:calc(50% - 30px);background:var(--gold);color:#fff;font:800 11px/1 var(--display);width:18px;height:18px;border-radius:50%;display:grid;place-items:center}
+.side{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px}
+.side h3{margin-top:0}
+.roster{list-style:none;margin:0;padding:0}
+.roster li{display:grid;grid-template-columns:38px 1fr auto;gap:8px;align-items:center;padding:6px 0;border-top:1px solid var(--line)}
+.roster li:first-child{border-top:0}
+.roster .r{font:700 14px/1 var(--display);color:var(--muted)}
+.btn{border:1.5px solid var(--ink);background:var(--ink);color:var(--paper);border-radius:8px;padding:8px 14px;font-weight:600}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+select.sel{border:1.5px solid var(--line);background:var(--card);border-radius:8px;padding:8px 10px;font-weight:600}
+
+/* Transfers */
+.tf{display:grid;gap:10px}
+.tcard{background:var(--card);border:1px solid var(--line);border-left:5px solid var(--green);border-radius:8px;padding:12px 14px;display:grid;grid-template-columns:1fr auto;gap:4px 14px}
+.tcard.rumor{border-left-color:var(--gold)}
+.tcard .pl{font:700 21px/1.1 var(--display)}
+.tcard .route{font-size:15px}
+.tcard .route b{font-weight:600}
+.tcard .fee{font:800 22px/1 var(--display);text-align:right;grid-row:1/3;grid-column:2;align-self:center}
+.tcard .info{grid-column:1/-1;font-size:14px;color:var(--muted)}
+.badge{display:inline-block;font:700 12px/1 var(--body);padding:3px 7px;border-radius:4px;background:var(--green);color:#fff;margin-left:6px;vertical-align:2px}
+.rumor .badge{background:var(--gold)}
+
+/* Dialogs */
+dialog{border:0;padding:0;overflow:auto;background:var(--card);color:var(--ink);border-radius:14px;width:min(560px,calc(100vw - 24px));max-height:calc(100vh - 40px);box-shadow:0 20px 60px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(20,10,12,.55)}
+.dlg-h{display:flex;align-items:center;gap:14px;padding:16px 16px 12px;border-bottom:2px solid var(--red);position:sticky;top:0;background:var(--card);z-index:2}
+.dlg-h h2{font-size:28px}
+.dlg-h p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.x{margin-left:auto;border:0;background:var(--paper);width:36px;height:36px;border-radius:50%;font-size:20px;line-height:1;flex:none}
+.dlg-b{padding:4px 16px 18px}
+.dlg-b h3{font-size:19px;margin:18px 0 8px}
+.kv{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}
+.kv div{background:var(--paper);border-radius:8px;padding:10px;text-align:center}
+.kv b{display:block;font:800 26px/1 var(--display)}
+.kv span{font-size:12px;color:var(--muted)}
+.mini{display:grid;grid-template-columns:auto 1fr auto;gap:4px 10px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.mini:first-of-type{border-top:0}
+.mini .when{font-size:13px;color:var(--muted);grid-column:1/-1}
+.res{font:800 13px/1 var(--display);width:22px;height:22px;border-radius:4px;display:grid;place-items:center;color:#fff}
+.res.W{background:var(--green)} .res.D{background:var(--muted)} .res.L{background:var(--red)}
+.mini .s{font:800 18px/1 var(--display)}
+.pick-tools{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.pick-tools input{flex:1 1 180px;border:1.5px solid var(--line);background:var(--paper);border-radius:8px;padding:8px 10px}
+.plist{list-style:none;margin:0;padding:0;max-height:46vh;overflow:auto;border:1px solid var(--line);border-radius:8px}
+.plist button{width:100%;display:grid;grid-template-columns:30px 1fr auto;gap:10px;align-items:center;background:none;border:0;border-top:1px solid var(--line);padding:8px 10px;text-align:left}
+.plist li:first-child button{border-top:0}
+.plist button:hover{background:var(--paper)}
+.plist .crest{width:24px;height:28px}
+.plist small{color:var(--muted)}
+.custom{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
+.custom input{flex:1 1 160px;border:1.5px solid var(--line);background:var(--paper);border-radius:8px;padding:8px 10px}
+.empty{padding:16px;color:var(--muted)}
+footer{max-width:1080px;margin:0 auto;padding:0 16px 30px;font-size:13px;color:var(--muted)}
+
+.theme{border:1.5px solid var(--line);background:var(--card);border-radius:999px;width:36px;height:36px;font-size:17px;line-height:1;order:5}
+@media (min-width:761px){.theme{order:0}}
+.next{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px;background:var(--ink);color:var(--paper);border-radius:12px;padding:16px;margin:4px 0 8px}
+.next .side-t{display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;font:700 19px/1.1 var(--display)}
+.next .crest{width:48px;height:56px}
+.next .mid{text-align:center}
+.next .cd{font:800 34px/1 var(--display);font-variant-numeric:tabular-nums}
+.next .cd small{font:600 13px/1.2 var(--body);display:block;opacity:.75;margin-top:4px}
+.next .when{font-size:13px;opacity:.8;margin-top:8px}
+.next-h{display:flex;align-items:baseline;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.tname{background:none;border:0;padding:0;font:inherit;text-align:left;cursor:pointer}
+.tname:hover{text-decoration:underline;text-underline-offset:3px}
+.fgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:6px}
+.fgrid label{display:flex;align-items:center;gap:8px;padding:6px 8px;border-radius:8px;background:var(--paper);font-size:15px;cursor:pointer}
+.fgrid input{width:18px;height:18px;accent-color:var(--red);flex:none}
+.favbtn{margin-top:14px}
+/* Mobile: bottom tab bar */
+@media (max-width:760px){
+  .brand{font-size:28px}
+  .tabs{position:fixed;left:0;right:0;bottom:0;margin:0;z-index:25;background:var(--card);border-top:2px solid var(--red);justify-content:space-around;padding:6px 4px calc(6px + env(safe-area-inset-bottom,0px))}
+  .tab{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:12px;padding:4px 2px;min-width:52px;background:none!important;box-shadow:none!important}
+  .tab .ic{display:block;font-size:19px;line-height:1}
+  .tab[aria-current="page"]{color:var(--red)}
+  .boleto-head,.qrow{grid-template-columns:26px 1fr 114px;gap:8px;padding-left:10px;padding-right:10px}
+  .mark{height:34px}
+  .sc{min-width:54px;font-size:20px}
+  .t .crest{width:22px;height:26px}
+  .goals{font-size:13px}
+}
+@media (prefers-reduced-motion:no-preference){
+  .mark{transition:background .12s,color .12s}
+  .view.on{animation:in .18s ease-out}
+  @keyframes in{from{opacity:.4}to{opacity:1}}
+}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="top-in">
+    <h1 class="brand">Fútbol a Tope</h1>
+    <span class="stamp">Diseñada por Marco. Datos del 23 de noviembre de 2026</span>
+    <button class="theme" id="theme" aria-label="Cambiar entre modo claro y oscuro">🌙</button>
+    <nav class="tabs" aria-label="Secciones">
+      <button class="tab" data-v="hoy"><span class="ic" aria-hidden="true">📋</span>Hoy</button>
+      <button class="tab" data-v="resultados"><span class="ic" aria-hidden="true">⚽</span>Resultados</button>
+      <button class="tab" data-v="ligas"><span class="ic" aria-hidden="true">🏆</span>Ligas</button>
+      <button class="tab" data-v="estadisticas"><span class="ic" aria-hidden="true">📊</span>Estadísticas</button>
+      <button class="tab" data-v="mi-once"><span class="ic" aria-hidden="true">👕</span>Mi once</button>
+      <button class="tab" data-v="fichajes"><span class="ic" aria-hidden="true">✍️</span>Fichajes</button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <section class="view" id="v-hoy" aria-labelledby="h-hoy">
+    <div class="next-h"><h2 id="h-hoy">Tus equipos</h2><button class="linkbtn" id="edit-favs">Editar favoritos</button></div>
+    <p class="sub">Toca un escudo para ver su posición, últimos resultados, próximos partidos y fichajes.</p>
+    <div class="rail" id="rail"></div>
+
+    <h3>Tu próximo partido</h3>
+    <div id="next"></div>
+
+    <h3>Tu quiniela de la semana</h3>
+    <p class="sub">Los próximos partidos de tus equipos, en liga y en Champions. Marca 1, X o 2 y se guarda en este navegador.</p>
+    <div class="boleto" id="boleto"></div>
+
+    <h3>Lo último de tus equipos</h3>
+    <div class="list" id="last"></div>
+  </section>
+
+  <section class="view" id="v-resultados" aria-labelledby="h-res">
+    <h2 id="h-res">Resultados y calendario</h2>
+    <p class="sub">Elige competición y jornada. Toca un partido jugado para ver los goleadores. Tus equipos van marcados con un punto rojo.</p>
+    <div class="pills" id="res-comp" role="group" aria-label="Competición"></div>
+    <div class="pills" id="res-round" role="group" aria-label="Jornada"></div>
+    <div class="list" id="res-list"></div>
+    <p class="note" id="res-note"></p>
+  </section>
+
+  <section class="view" id="v-ligas" aria-labelledby="h-lig">
+    <h2 id="h-lig">Ligas por país</h2>
+    <p class="sub">Clasificaciones tras la última jornada disputada. Tus equipos van resaltados. Toca cualquier equipo para ver su ficha y añadirlo a favoritos.</p>
+    <div class="pills" id="lig-comp" role="group" aria-label="Liga"></div>
+    <div class="tbl-wrap"><table id="lig-tbl"></table></div>
+    <div class="legend" id="lig-legend"></div>
+    <p class="note" id="lig-note"></p>
+  </section>
+
+  <section class="view" id="v-estadisticas" aria-labelledby="h-st">
+    <h2 id="h-st">Estadísticas de jugadores</h2>
+    <p class="sub">Máximos goleadores de cada competición. Los jugadores de tus equipos aparecen en rojo.</p>
+    <div class="pills" id="st-comp" role="group" aria-label="Competición"></div>
+    <label class="toggle"><input type="checkbox" id="st-only"> Solo jugadores de mis equipos</label>
+    <div class="scorers" id="st-list"></div>
+    <div class="facts" id="st-facts"></div>
+  </section>
+
+  <section class="view" id="v-mi-once" aria-labelledby="h-once">
+    <h2 id="h-once">Mi once</h2>
+    <p class="sub">Elige sistema y toca cada posición para colocar a un jugador de tus equipos, o escribe el que quieras. Se guarda en este navegador.</p>
+    <div class="once-ctl">
+      <input type="text" id="once-name" aria-label="Nombre de tu equipo" maxlength="40">
+      <select class="sel" id="once-form" aria-label="Sistema">
+        <option>4-3-3</option><option>4-4-2</option><option>4-2-3-1</option><option>3-5-2</option>
+      </select>
+    </div>
+    <div class="once">
+      <div class="pitch" id="pitch">
+        <div class="ln half"></div><div class="ln circle"></div>
+        <div class="ln box-t"></div><div class="ln six-t"></div>
+        <div class="ln box-b"></div><div class="ln six-b"></div>
+      </div>
+      <aside class="side">
+        <h3>Tu alineación</h3>
+        <ul class="roster" id="roster"></ul>
+        <p class="note" id="once-count"></p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn ghost" id="once-clear">Vaciar alineación</button>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="view" id="v-fichajes" aria-labelledby="h-fi">
+    <h2 id="h-fi">Fichajes</h2>
+    <p class="sub">Las operaciones cerradas del verano de 2026 y lo que se mueve para el mercado de enero.</p>
+    <div class="pills" id="fi-kind" role="group" aria-label="Tipo"></div>
+    <div style="margin:0 0 12px"><select class="sel" id="fi-team" aria-label="Equipo"></select></div>
+    <div class="tf" id="fi-list"></div>
+  </section>
+</main>
+
+<footer>
+  <b>Fútbol a Tope</b>, diseñada por Marco. Datos recopilados el 23/11/2026 de AFP, UEFA, LaLiga, Premier League, DFL, LFP y prensa deportiva (AS, Sport, Marca, DAZN, SI, Fichajes.net, Kicker y otros). Horarios en hora peninsular española. Para actualizar resultados, pídele a Claude que actualice la app.
+</footer>
+
+<dialog id="dlg-team" aria-labelledby="dt-name"></dialog>
+<dialog id="dlg-pick" aria-labelledby="dp-title"></dialog>
+<dialog id="dlg-favs" aria-labelledby="df-title"></dialog>
+
+<script>
+/* ================== DATOS ================== */
+const TEAMS = [
+  {id:"bar",n:"Barcelona",c:"#A50044",lg:"laliga",coach:"Hansi Flick"},
+  {id:"osa",n:"Osasuna",c:"#D91A21",lg:"laliga"},
+  {id:"atm",n:"Atlético",full:"Atlético de Madrid",c:"#CB3524",lg:"laliga",coach:"Diego Simeone"},
+  {id:"rma",n:"Real Madrid",c:"#E8B10F",lt:1,lg:"laliga",coach:"José Mourinho"},
+  {id:"liv",n:"Liverpool",c:"#C8102E",lg:"premier",coach:"Andoni Iraola"},
+  {id:"che",n:"Chelsea",c:"#034694",lg:"premier"},
+  {id:"mci",n:"Man City",full:"Manchester City",c:"#6CABDD",lt:1,lg:"premier",coach:"Enzo Maresca"},
+  {id:"ars",n:"Arsenal",c:"#EF0107",lg:"premier",coach:"Mikel Arteta"},
+  {id:"mun",n:"Man United",full:"Manchester United",c:"#DA291C",lg:"premier",coach:"Mauricio Pochettino"},
+  {id:"int",n:"Inter",full:"Inter de Milán",c:"#0068A8",lg:"seriea"},
+  {id:"juv",n:"Juventus",c:"#222222",lg:"seriea"},
+  {id:"mil",n:"Milan",c:"#FB090B",lg:"seriea"},
+  {id:"com",n:"Como",c:"#1B4E9B",lg:"seriea",coach:"Cesc Fàbregas"},
+  {id:"bay",n:"Bayern",full:"Bayern de Múnich",c:"#DC052D",lg:"bundes"},
+  {id:"bvb",n:"Dortmund",full:"Borussia Dortmund",c:"#FDE100",lt:1,lg:"bundes"},
+  {id:"lev",n:"Leverkusen",full:"Bayer Leverkusen",c:"#E32221",lg:"bundes"},
+  {id:"rbl",n:"Leipzig",full:"RB Leipzig",c:"#DD0741",lg:"bundes"},
+  {id:"psg",n:"PSG",full:"Paris Saint-Germain",c:"#004170",lg:"ligue1"},
+  {id:"lil",n:"Lille",c:"#E01E13",lg:"ligue1",coach:"Davide Ancelotti"},
+  {id:"mon",n:"Mónaco",c:"#E7192E",lg:"ligue1",coach:"Filipe Luís"},
+  {id:"om",n:"Marsella",c:"#2FAEE0",lt:1,lg:"ligue1",coach:"Bruno Genesio"}
+];
+const BYNAME = {}; TEAMS.forEach(t=>BYNAME[t.n]=t);
+const TEAM = id=>TEAMS.find(t=>t.id===id);
+
+const COMPS = {
+ laliga:{name:"LaLiga",flag:"🇪🇸",country:"España",rounds:[
+  {label:"Jornada 13",date:"2026-11-22",matches:[
+   ["Athletic","Espanyol",0,1,"","Roberto Fernández 66'"],
+   ["Alavés","Deportivo",3,1,"Ángel Pérez 2', Boyé 62', Denis Suárez 90'","Tenaglia 41' (p.p.)"],
+   ["Rayo","Valencia",0,1,"","Copete 41'"],
+   ["Sevilla","Betis",1,1,"Salas 90+1'","Antony 50'"],
+   ["Real Madrid","Celta",2,1,"Bellingham 66', Espí 85'","Durán 6'"],
+   ["Barcelona","Villarreal",3,2,"Gerard Martín 57', Fermín López 61', Navarro 67' (p.p.)","Buchanan 5', Oluwaseyi 7'"],
+   ["Racing","Real Sociedad",3,2,"Zabiri 6', 8', Canales 68' (pen.)","Oyarzabal 45+1', Guedes 60'"],
+   ["Osasuna","Málaga",1,0,"Budimir 20'",""],
+   ["Getafe","Atlético",0,3,"","Baena 10', Cardoso 30', Grimaldo 90+2' (pen.)"],
+   {h:"Levante",a:"Elche",d:"2026-11-23",t:"21:00"}
+  ]},
+  {label:"Jornada 14",up:1,matches:[
+   {h:"Levante",a:"Racing",d:"2026-11-27",t:"21:00"},
+   {h:"Betis",a:"Rayo",d:"2026-11-28",t:"14:00"},
+   {h:"Málaga",a:"Athletic",d:"2026-11-28",t:"16:15"},
+   {h:"Elche",a:"Atlético",d:"2026-11-28",t:"18:30"},
+   {h:"Real Madrid",a:"Alavés",d:"2026-11-28",t:"21:00"},
+   {h:"Valencia",a:"Osasuna",d:"2026-11-29",t:"14:00"},
+   {h:"Deportivo",a:"Barcelona",d:"2026-11-29",t:"16:15"},
+   {h:"Celta",a:"Villarreal",d:"2026-11-29",t:"18:30"},
+   {h:"Real Sociedad",a:"Sevilla",d:"2026-11-29",t:"21:00"},
+   {h:"Espanyol",a:"Getafe",d:"2026-11-30",t:"21:00"}
+  ]},
+  {label:"J23 adelantada",up:1,note:"Partidos de la jornada 23 adelantados por la Supercopa.",matches:[
+   {h:"Real Sociedad",a:"Real Madrid",d:"2026-12-02",t:"19:00"},
+   {h:"Barcelona",a:"Atlético",d:"2026-12-02",t:"21:30"}
+  ]}
+ ]},
+ premier:{name:"Premier League",flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",country:"Inglaterra",rounds:[
+  {label:"Jornada 9",date:"2026-11-01",matches:[
+   ["Chelsea","Man United",2,0,"Rogers 50', Palmer 64' (pen.)",""],
+   ["Man City","Brighton",0,1,"","Ayari 11'"],
+   ["Bournemouth","Leeds",2,0,"Barbosa 31', Adli 90+4'",""],
+   ["Hull","Ipswich",2,2,"Iroegbunam 58', McBurnie 68'","Florentino 22', Enciso 74'"],
+   ["Coventry","Sunderland",3,1,"Sakamoto 17', Awoniyi 37', Rudoni 52'","Le Fée 67' (pen.)"],
+   ["Brentford","Nottingham",2,0,"Milenković 30' (p.p.), Igor Thiago 76'",""],
+   ["Tottenham","Crystal Palace",2,0,"Gray 25', van Hecke 73'",""],
+   ["Aston Villa","Fulham",1,1,"Jackson 39'","Suzuki 64' (p.p.)"],
+   ["Liverpool","Arsenal",0,1,"","Havertz 16'"],
+   ["Newcastle","Everton",0,1,"","Barry 49'"]
+  ]},
+  {label:"Jornada 10",date:"2026-11-08",note:"Solo se muestran los partidos con marcador confirmado.",matches:[
+   ["Everton","Coventry",3,1,"Barry 56', 61', Dewsbury-Hall 81'","Gboho 52'"],
+   ["Leeds","Tottenham",1,0,"Okafor 79'",""],
+   ["Fulham","Newcastle",1,1,"Muniz 83'","Murphy 80'"],
+   ["Arsenal","Hull",1,0,"Ødegaard 72'",""],
+   ["Nottingham","Man City",3,1,"Cunha 6', Delap 18', 73'","Cherki 52'"],
+   ["Crystal Palace","Liverpool",1,3,"",""],
+   ["Man United","Aston Villa",4,4,"",""]
+  ]},
+  {label:"Jornada 11",date:"2026-11-22",matches:[
+   ["Man City","Fulham",1,1,"Anderson 57'","Muniz 16'"],
+   ["Tottenham","Ipswich",2,0,"Williams-Barnett 15', Solanke 52'",""],
+   ["Aston Villa","Sunderland",0,0,"",""],
+   ["Coventry","Crystal Palace",3,2,"Awoniyi 5', Sakamoto 30', McNeil 85' (p.p.)","Pino 13', Strand Larsen 45+1'"],
+   ["Bournemouth","Nottingham",2,0,"Evanilson 19', Kluivert 45+3'",""],
+   ["Chelsea","Leeds",1,4,"Emegha 25'","Okafor 28', 58', Calvert-Lewin 53' (pen.), Aaronson 90+1'"],
+   ["Newcastle","Arsenal",2,2,"Barnes 49', Thiaw 62'","Eze 33', Madueke 78'"],
+   ["Hull","Brighton",2,0,"McBurnie 90+2', 90+5'",""],
+   ["Liverpool","Man United",4,0,"Szoboszlai 10', Wirtz 13', Ngumoha 66', Víctor Muñoz 82'",""],
+   {h:"Brentford",a:"Everton",d:"2026-11-23",t:"21:00"}
+  ]},
+  {label:"Jornada 12",up:1,matches:[
+   {h:"Nottingham",a:"Chelsea",d:"2026-11-27",t:"21:00"},
+   {h:"Leeds",a:"Coventry",d:"2026-11-28",t:"16:00"},
+   {h:"Man United",a:"Brentford",d:"2026-11-28",t:"16:00"},
+   {h:"Ipswich",a:"Aston Villa",d:"2026-11-28",t:"18:30"},
+   {h:"Everton",a:"Liverpool",d:"2026-11-29",t:"13:00"},
+   {h:"Brighton",a:"Newcastle",d:"2026-11-29",t:"15:05"},
+   {h:"Crystal Palace",a:"Hull",d:"2026-11-29",t:"15:05"},
+   {h:"Sunderland",a:"Tottenham",d:"2026-11-29",t:"15:05"},
+   {h:"Fulham",a:"Bournemouth",d:"2026-11-29",t:"15:05"},
+   {h:"Arsenal",a:"Man City",d:"2026-11-29",t:"17:30"}
+  ]}
+ ]},
+ seriea:{name:"Serie A",flag:"🇮🇹",country:"Italia",rounds:[
+  {label:"Jornada 12",date:"2026-11-22",matches:[
+   ["Como","Cagliari",2,0,"Ramón 24', Da Cunha 56'",""],
+   ["Lazio","Lecce",3,0,"Noslin 25', 68', Frattesi 90'",""],
+   ["Parma","Roma",1,5,"Elphege 54'","Malen 39', 68', 77', 90', Mora 71'"],
+   ["Nápoles","Torino",1,0,"McTominay 73'",""],
+   ["Juventus","Venezia",4,0,"Woltemade 53', Koopmeiners 59', Cabal 65', Kolo Muani 71' (pen.)",""],
+   ["Bolonia","Udinese",1,1,"Zortea 43'","Zaniolo 67'"],
+   ["Sassuolo","Génova",0,2,"","Osmajić 26', 38'"],
+   ["Milan","Frosinone",5,1,"Calvani 4' (p.p.), Ramos 19', Jashari 48', Cissè 60', Pulisic 68'","Masini 25'"],
+   ["Atalanta","Inter",4,4,"Elmas 35', De Ketelaere 72', 80', Kessié 90+1' (pen.)","Esposito 16', 32', 52', Sučić 76' (pen.)"],
+   {h:"Monza",a:"Fiorentina",d:"2026-11-23",t:"20:45"}
+  ]},
+  {label:"Jornada 13",up:1,matches:[
+   {h:"Venezia",a:"Bolonia",d:"2026-11-27",t:"20:45"},
+   {h:"Frosinone",a:"Parma",d:"2026-11-28",t:"15:00"},
+   {h:"Torino",a:"Lazio",d:"2026-11-28",t:"18:00"},
+   {h:"Inter",a:"Génova",d:"2026-11-28",t:"20:45"},
+   {h:"Udinese",a:"Fiorentina",d:"2026-11-29",t:"12:30"},
+   {h:"Sassuolo",a:"Nápoles",d:"2026-11-29",t:"15:00"},
+   {h:"Roma",a:"Monza",d:"2026-11-29",t:"18:00"},
+   {h:"Como",a:"Juventus",d:"2026-11-29",t:"20:45"},
+   {h:"Lecce",a:"Atalanta",d:"2026-11-30",t:"18:30"},
+   {h:"Cagliari",a:"Milan",d:"2026-11-30",t:"20:45"}
+  ]}
+ ]},
+ bundes:{name:"Bundesliga",flag:"🇩🇪",country:"Alemania",rounds:[
+  {label:"Jornada 9",date:"2026-11-08",note:"Solo se muestran los partidos con marcador confirmado.",matches:[
+   ["Hamburgo","Gladbach",3,1,"Muheim 11', Nandja 59', Grønbæk 70'","Scally 44'"],
+   ["Dortmund","Elversberg",2,1,"Nmecha 55', 71'","Noel 81'"],
+   ["Leipzig","Augsburgo",5,2,"Banzuzi 33', Nkunku 35', Raum 45+1', Cardoso Da Cruz 60', Baumgartner 66'","Kade 1', Ogundu 90+2'"],
+   ["Maguncia","Bayern",1,2,"",""]
+  ]},
+  {label:"Jornada 10",date:"2026-11-22",matches:[
+   ["Bayern","Colonia",1,1,"Brown 37'","Moore 12'"],
+   ["Leverkusen","Paderborn",4,0,"Moreira 14', 47', Schick 51', Equi Fernández 59'",""],
+   ["Frankfurt","Hoffenheim",1,0,"Burkardt 25'",""],
+   ["Union Berlin","Leipzig",1,5,"Aebischer 41'","Nusa 18' (pen.), Rômulo 50', Gruda 72', Reitz 76', Baku 89'"],
+   ["Gladbach","Dortmund",0,1,"","Nmecha 80'"],
+   ["Elversberg","Friburgo",0,1,"","Matanović 68'"],
+   ["Schalke","Stuttgart",0,0,"",""],
+   ["Augsburgo","Maguncia",3,1,"Gregoritsch 19', 48', Juma Bah 36'","Königsdörffer 51'"],
+   ["Werder","Hamburgo",4,0,"Friedl 55', Njinmah 66', 70', Füllkrug 90+2'",""]
+  ]},
+  {label:"Jornada 11",up:1,matches:[
+   {h:"Werder",a:"Gladbach",d:"2026-11-27",t:"20:30"},
+   {h:"Paderborn",a:"Schalke",d:"2026-11-28",t:"15:30"},
+   {h:"Colonia",a:"Elversberg",d:"2026-11-28",t:"15:30"},
+   {h:"Hamburgo",a:"Bayern",d:"2026-11-28",t:"15:30"},
+   {h:"Stuttgart",a:"Frankfurt",d:"2026-11-28",t:"18:30"},
+   {h:"Friburgo",a:"Leipzig",d:"2026-11-29",t:"15:30"},
+   {h:"Hoffenheim",a:"Augsburgo",d:"2026-11-29",t:"17:30"},
+   {h:"Dortmund",a:"Leverkusen",d:"2026-11-29",t:"19:30"}
+  ]}
+ ]},
+ ligue1:{name:"Ligue 1",flag:"🇫🇷",country:"Francia",rounds:[
+  {label:"Jornada 10",date:"2026-11-08",matches:[
+   ["Toulouse","Estrasburgo",3,1,"Hidalgo Massa 45+1', McKenzie 56', Jørgensen 76'","Reyna 67'"],
+   ["Auxerre","Paris FC",0,1,"","Sinayoko 63'"],
+   ["PSG","Troyes",1,0,"Zabarnyi 39'",""],
+   ["Rennes","Lille",1,2,"Dia 31'","Diaoune 24', Ngoy 68'"],
+   ["Le Havre","Lorient",0,2,"","Touré 18', Makengo 90+5'"],
+   ["Le Mans","Mónaco",1,1,"Colas 90'","Coulibaly 40'"],
+   ["Angers","Niza",0,2,"","Diop 2', Clauss 78'"],
+   ["Brest","Lyon",2,0,"Edjouma 22', Ajorque 90+4' (pen.)",""],
+   ["Lens","Marsella",1,2,"Thauvin 20'","Gouiri 2', Abdallah 82'"]
+  ]},
+  {label:"Jornada 11",date:"2026-11-22",matches:[
+   ["Troyes","Le Havre",3,1,"Mille 19', 69', Ripart 90+8' (pen.)","Maja 3'"],
+   ["Niza","PSG",2,3,"Amoura 8', Abdy 90+5'","Mayulu 31' (pen.), Doué 32', Ferran Torres 85'"],
+   ["Estrasburgo","Brest",0,1,"","Edjouma 22'"],
+   ["Mónaco","Auxerre",1,1,"Diop 82'","Faivre 29'"],
+   ["Lens","Toulouse",1,1,"Cuisance 47'","Russell-Rowe 39'"],
+   ["Lille","Lyon",0,1,"","Bidstrup 40'"],
+   ["Paris FC","Angers",4,0,"Zabi Gueu 47', Koleosho 55', Maxime Lopez 65', Coppola 72'",""],
+   ["Lorient","Rennes",1,1,"Talbi 45'","Dia 27'"],
+   ["Marsella","Le Mans",2,3,"Gouiri 33', Paixão 40'","Mafouta 70', Colas 84', Vercruysse 90+5'"]
+  ]},
+  {label:"Jornada 12",up:1,matches:[
+   {h:"Brest",a:"Paris FC",d:"2026-11-27",t:"20:45"},
+   {h:"Angers",a:"Lens",d:"2026-11-28",t:"17:15"},
+   {h:"PSG",a:"Lorient",d:"2026-11-28",t:"20:45"},
+   {h:"Le Mans",a:"Lille",d:"2026-11-28",t:"20:45"},
+   {h:"Le Havre",a:"Estrasburgo",d:"2026-11-28",t:"20:45"},
+   {h:"Niza",a:"Troyes",d:"2026-11-28",t:"20:45"},
+   {h:"Auxerre",a:"Marsella",d:"2026-11-29",t:"15:00"},
+   {h:"Toulouse",a:"Rennes",d:"2026-11-29",t:"17:15"},
+   {h:"Lyon",a:"Mónaco",d:"2026-11-29",t:"20:45"}
+  ]}
+ ]},
+ ucl:{name:"Champions",flag:"⭐",country:"Europa",rounds:[
+  {label:"Jornada 4",date:"2026-11-04",matches:[
+   ["Shakhtar","Sporting",0,1,"",""],
+   ["Galatasaray","Stuttgart",2,0,"",""],
+   ["Atlético","Bayern",0,2,"",""],
+   ["Barcelona","Aston Villa",3,0,"",""],
+   ["Feyenoord","Inter",0,3,"",""],
+   ["Bodø/Glimt","Lille",0,0,"",""],
+   ["LASK","Slovan",4,0,"",""],
+   ["Man United","Roma",3,2,"",""],
+   ["Villarreal","PSG",0,6,"",""],
+   ["AEK","Real Madrid",2,3,"",""],
+   ["Fenerbahçe","Liverpool",3,2,"",""],
+   ["Dortmund","Betis",2,1,"",""],
+   ["Porto","Nápoles",4,1,"",""],
+   ["PSV","Brujas",1,2,"",""],
+   ["Leipzig","Man City",2,3,"",""],
+   ["Lens","Como",1,9,"",""],
+   ["Slavia Praga","Arsenal",1,2,"","Madueke, Gyökeres"],
+   ["Viking","Sabah",4,1,"",""]
+  ]},
+  {label:"Jornada 5",up:1,matches:[
+   {h:"Bodø/Glimt",a:"LASK",d:"2026-11-24",t:"18:45"},
+   {h:"Galatasaray",a:"Aston Villa",d:"2026-11-24",t:"18:45"},
+   {h:"Arsenal",a:"Dortmund",d:"2026-11-24",t:"21:00"},
+   {h:"Como",a:"AEK",d:"2026-11-24",t:"21:00"},
+   {h:"Feyenoord",a:"Porto",d:"2026-11-24",t:"21:00"},
+   {h:"Man City",a:"Nápoles",d:"2026-11-24",t:"21:00"},
+   {h:"Leipzig",a:"Lens",d:"2026-11-24",t:"21:00"},
+   {h:"Real Madrid",a:"PSV",d:"2026-11-24",t:"21:00"},
+   {h:"Slovan",a:"Betis",d:"2026-11-24",t:"21:00"},
+   {h:"Sabah",a:"Barcelona",d:"2026-11-25",t:"18:45"},
+   {h:"Slavia Praga",a:"Villarreal",d:"2026-11-25",t:"18:45"},
+   {h:"Atlético",a:"Viking",d:"2026-11-25",t:"21:00"},
+   {h:"Brujas",a:"Liverpool",d:"2026-11-25",t:"21:00"},
+   {h:"Inter",a:"Stuttgart",d:"2026-11-25",t:"21:00"},
+   {h:"Shakhtar",a:"Fenerbahçe",d:"2026-11-25",t:"21:00"},
+   {h:"Lille",a:"Bayern",d:"2026-11-25",t:"21:00"},
+   {h:"PSG",a:"Roma",d:"2026-11-25",t:"21:00"},
+   {h:"Sporting",a:"Man United",d:"2026-11-25",t:"21:00"}
+  ]}
+ ]}
+};
+
+// Clasificaciones: [equipo, PJ, G, E, P, GF, GC, Pts]
+const TABLES = {
+ laliga:{zones:{ucl:4,uel:6,rel:18},note:"Falta el Levante–Elche del lunes 23.",rows:[
+  ["Barcelona",13,12,0,1,51,15,36],["Real Madrid",13,11,0,2,33,11,33],["Atlético",13,10,1,2,26,10,31],["Betis",13,8,3,2,21,16,27],
+  ["Real Sociedad",13,7,1,5,23,23,22],["Sevilla",13,5,4,4,18,20,19],["Racing",13,5,2,6,20,32,17],["Athletic",12,4,4,4,15,12,16],
+  ["Alavés",13,4,4,5,18,18,16],["Villarreal",13,4,3,6,19,18,15],["Espanyol",13,4,3,6,14,14,15],["Deportivo",13,3,6,4,16,17,15],
+  ["Osasuna",13,4,3,6,13,23,15],["Celta",13,2,7,4,11,12,13],["Rayo",12,3,3,6,15,22,12],["Valencia",13,3,3,7,9,20,12],
+  ["Getafe",13,3,3,7,8,21,12],["Levante",12,2,5,5,16,21,11],["Elche",12,2,4,6,14,20,10],["Málaga",13,0,5,8,9,24,5]]},
+ premier:{zones:{ucl:4,uel:5,rel:18},note:"Falta el Brentford–Everton del lunes 23.",rows:[
+  ["Arsenal",11,9,1,1,17,7,28],["Brighton",11,7,1,3,26,9,22],["Man City",11,7,1,3,22,14,22],["Liverpool",11,6,3,2,18,10,21],
+  ["Bournemouth",11,5,3,3,18,14,18],["Leeds",11,4,5,2,14,9,17],["Everton",10,4,4,2,12,10,16],["Chelsea",11,5,1,5,20,20,16],
+  ["Tottenham",11,4,3,4,12,11,15],["Brentford",10,3,5,2,16,11,14],["Hull",11,3,5,3,13,11,14],["Aston Villa",11,3,5,3,14,17,14],
+  ["Newcastle",11,3,4,4,15,18,13],["Coventry",11,4,0,7,13,21,12],["Fulham",11,2,5,4,11,13,11],["Ipswich",11,3,2,6,15,22,11],
+  ["Nottingham",11,2,3,6,9,15,9],["Sunderland",11,2,3,6,8,17,9],["Man United",11,1,5,5,14,23,8],["Crystal Palace",11,2,1,8,12,27,7]]},
+ seriea:{zones:{ucl:4,uel:6,rel:18},note:"Falta el Monza–Fiorentina del lunes 23.",rows:[
+  ["Lazio",12,10,2,0,28,9,32],["Roma",12,9,3,0,36,11,30],["Inter",12,9,2,1,32,17,29],["Milan",12,8,3,1,28,14,27],
+  ["Como",12,8,2,2,20,10,26],["Juventus",12,6,3,3,19,12,21],["Frosinone",12,6,2,4,25,20,20],["Nápoles",12,5,3,4,19,14,18],
+  ["Bolonia",12,5,3,4,17,15,18],["Génova",12,5,1,6,13,16,16],["Cagliari",12,5,1,6,10,17,16],["Atalanta",12,4,3,5,21,24,15],
+  ["Torino",12,4,2,6,15,18,14],["Lecce",12,3,1,8,12,25,10],["Fiorentina",11,2,3,6,17,25,9],["Parma",12,2,2,8,10,22,8],
+  ["Sassuolo",12,2,2,8,16,31,8],["Monza",11,2,1,8,17,25,7],["Udinese",12,1,3,8,13,26,6],["Venezia",12,2,0,10,8,25,6]]},
+ bundes:{zones:{ucl:4,uel:6,rel:17,pl:16},rows:[
+  ["Dortmund",10,7,3,0,17,7,24],["Bayern",10,6,4,0,30,10,22],["Friburgo",10,7,1,2,21,10,22],["Leipzig",10,7,0,3,32,14,21],
+  ["Leverkusen",10,6,1,3,24,17,19],["Werder",10,5,3,2,21,15,18],["Frankfurt",10,4,3,3,16,20,15],["Stuttgart",10,4,1,5,15,15,13],
+  ["Elversberg",10,4,1,5,17,19,13],["Augsburgo",10,3,3,4,23,21,12],["Hoffenheim",10,4,0,6,16,18,12],["Hamburgo",10,4,0,6,10,24,12],
+  ["Maguncia",10,3,1,6,19,22,10],["Colonia",10,2,4,4,11,15,10],["Paderborn",10,2,4,4,8,15,10],["Schalke",10,1,4,5,5,11,7],
+  ["Union Berlin",10,1,4,5,8,26,7],["Gladbach",10,1,1,8,12,26,4]]},
+ ligue1:{zones:{ucl:3,ucq:4,uel:5,rel:17,pl:16},rows:[
+  ["PSG",11,8,2,1,25,12,26],["Paris FC",11,7,2,2,21,10,23],["Lille",11,6,3,2,14,8,21],["Lyon",11,6,2,3,16,9,20],
+  ["Marsella",11,6,0,5,24,17,18],["Brest",11,5,3,3,19,12,18],["Niza",11,5,2,4,17,15,17],["Mónaco",11,4,5,2,14,12,17],
+  ["Rennes",11,5,2,4,22,22,17],["Lorient",11,4,4,3,10,9,16],["Lens",11,4,2,5,18,16,14],["Toulouse",11,3,5,3,16,15,14],
+  ["Le Mans",11,2,5,4,15,21,11],["Troyes",11,3,2,6,10,18,11],["Auxerre",11,3,2,6,14,25,11],["Estrasburgo",11,3,1,7,18,23,10],
+  ["Angers",11,2,2,7,9,23,8],["Le Havre",11,0,2,9,10,25,2]]},
+ ucl:{ucl:1,zones:{ucl:8,uel:24,rel:25},note:"Clasificación tras la jornada 4 de la fase liga. Del 1º al 8º, directos a octavos; del 9º al 24º, eliminatoria previa; del 25º al 36º, eliminados.",rows:[
+  ["PSG",4,"+15",12],["Real Madrid",4,"+6",12],["Arsenal",4,"+5",10],["Como",4,"+13",9],["Barcelona",4,"+8",9],["Aston Villa",4,"+6",9],
+  ["Man City",4,"+5",9],["Liverpool",4,"+4",9],["Brujas",4,"+4",9],["Sporting",4,"+4",9],["Betis",4,"+2",9],["Dortmund",4,"+2",9],
+  ["Bayern",4,"+7",8],["Stuttgart",4,"+3",7],["Inter",4,"+2",6],["LASK",4,"+1",6],["Man United",4,"0",6],["Galatasaray",4,"−1",6],
+  ["Fenerbahçe",4,"−5",5],["Roma",4,"+2",4],["Shakhtar",4,"0",4],["Viking",4,"−1",4],["Atlético",4,"−1",4],["PSV",4,"−1",4],
+  ["Bodø/Glimt",4,"",4],["Porto",4,"",3],["Nápoles",4,"",3],["Villarreal",4,"",3],["Leipzig",4,"",3],["AEK",4,"",3],
+  ["Sabah",4,"",3],["Feyenoord",4,"",3],["Lens",4,"",3],["Slavia Praga",4,"",1],["Lille",4,"",1],["Slovan",4,"",0]]}
+};
+
+const SCORERS = {
+ laliga:{label:"LaLiga, tras la jornada 13",list:[["Raphinha","Barcelona",15],["Kylian Mbappé","Real Madrid",13],["Yassir Zabiri","Racing",11],["Lamine Yamal","Barcelona",10],["Ante Budimir","Osasuna",9],["Fermín López","Barcelona",8],["Sergio Camello","Rayo",7],["Roberto Fernández","Espanyol",7]],
+  facts:[["9","asistencias de Lamine Yamal, líder de la liga"],["19","goles más asistencias de Lamine Yamal, el que más participa en goles"],["37","goles y asistencias entre Raphinha y Lamine"]]},
+ premier:{label:"Premier League, hasta el 21 de noviembre",list:[["Erling Haaland","Man City",9],["Alexander Isak","Liverpool",7],["Nicolas Jackson","Aston Villa",6],["Thierno Barry","Everton",6],["Rayan Cherki","Man City",5],["Morgan Rogers","Chelsea",5],["João Pedro","Chelsea",5],["Evanilson","Bournemouth",5],["Marcus Tavernier","Bournemouth",5],["Bruno Fernandes","Man United",4],["Bryan Mbeumo","Man United",4]],
+  facts:[["5","asistencias de Declan Rice (Arsenal), líder de la Premier"],["3","goles encajados por el Arsenal en 4 partidos de Champions"]]},
+ seriea:{label:"Serie A, tras la jornada 12",list:[["Donyell Malen","Roma",12],["Gustavo Varela","Monza",9],["Antonio Raimondo","Frosinone",8],["Nikola Krstović","Atalanta",7],["Pio Esposito","Inter",6],["Marcus Thuram","Inter",6],["Alphadjo Cissè","Milan",6],["Tijjani Noslin","Lazio",6],["Milutin Osmajić","Génova",6],["Adrien Rabiot","Milan",5],["Tasos Douvikas","Como",5]],
+  facts:[["3","goles de Pio Esposito en el 4-4 del Inter en Bérgamo"],["5","asistencias de Wesley, Miranda y Zaccagni, líderes de la Serie A"]]},
+ bundes:{label:"Bundesliga, tras la jornada 10",list:[["Niclas Füllkrug","Werder",9],["Patrik Schick","Leverkusen",9],["Jonathan Burkardt","Frankfurt",6],["Younes Ebnoutalib","Frankfurt",6],["Michael Olise","Bayern",6],["Ermedin Demirović","Stuttgart",5],["Felix Nmecha","Dortmund",5],["Yuito Suzuki","Friburgo",5],["Harry Kane","Bayern",4]],
+  facts:[["7","asistencias de Harry Kane, que suma 11 participaciones en gol"],["4-0","del Leverkusen al Paderborn, con doblete de Moreira"]]},
+ ligue1:{label:"Ligue 1, tras la jornada 11",list:[["Lassine Sinayoko","Paris FC",9],["Amine Gouiri","Marsella",8],["Estéban Lepaul","Rennes",7],["Cameron Archer","Auxerre",6],["Elye Wahi","Niza",6],["Ferran Torres","PSG",5],["Josh Maja","Le Havre",5]],
+  facts:[["9-1","goleada del Como en Lens, récord de goles de un visitante en Champions"],["6-0","victoria del PSG en Villarreal en la jornada 4 de Champions"]]}
+};
+
+// Jugadores para Mi once: "POS:Nombre" separados por |
+const POOL = {
+ bar:"POR:Joan García|DEF:Pau Cubarsí|DEF:Gerard Martín|DEF:Alejandro Balde|DEF:Ronald Araújo|MED:Rodri|MED:Pedri|MED:Frenkie de Jong|MED:Fermín López|DEL:Lamine Yamal|DEL:Raphinha|DEL:Anthony Gordon|DEL:Karim Adeyemi|DEL:Gabriel Jesus",
+ rma:"POR:Thibaut Courtois|DEF:Marc Cucurella|DEF:Dean Huijsen|DEF:Denzel Dumfries|DEF:Raúl Asencio|DEF:Trent Alexander-Arnold|MED:Jude Bellingham|MED:Fede Valverde|MED:Bernardo Silva|DEL:Kylian Mbappé|DEL:Vinícius Jr.|DEL:Yan Diomande|DEL:Carlos Espí|DEL:Rodrygo|DEL:Endrick",
+ atm:"POR:Jan Oblak|DEF:Cristian Romero|DEF:Álex Grimaldo|MED:Morten Hjulmand|MED:Johnny Cardoso|MED:Álex Baena|MED:Kang-in Lee",
+ osa:"POR:Sergio Herrera|MED:Jon Moncayola|MED:Aimar Oroz|DEL:Ante Budimir|DEL:Anai Morales",
+ liv:"POR:Giorgi Mamardashvili|DEF:Virgil van Dijk|DEF:Milos Kerkez|DEF:Conor Bradley|DEF:Joe Gomez|DEF:Jeremy Jacquet|MED:Dominik Szoboszlai|MED:Florian Wirtz|DEL:Alexander Isak|DEL:Bradley Barcola|DEL:Rio Ngumoha|DEL:Federico Chiesa",
+ che:"POR:Emiliano Martínez|MED:Jordan Henderson|MED:Cole Palmer|MED:Morgan Rogers|DEL:João Pedro|DEL:Pedro Neto|DEL:Emanuel Emegha",
+ mci:"DEF:Joško Gvardiol|MED:Enzo Fernández|MED:Elliot Anderson|MED:Rayan Cherki|DEL:Erling Haaland|DEL:Antoine Semenyo",
+ ars:"POR:David Raya|POR:Kepa Arrizabalaga|MED:Declan Rice|MED:Martin Ødegaard|MED:Martín Zubimendi|MED:Eberechi Eze|DEL:Bukayo Saka|DEL:Noni Madueke|DEL:Kai Havertz|DEL:Viktor Gyökeres",
+ mun:"DEF:Lisandro Martínez|DEF:Harry Maguire|MED:Bruno Fernandes|DEL:Bryan Mbeumo|DEL:Joshua Zirkzee",
+ int:"DEF:Alessandro Bastoni|MED:Petar Sučić|DEL:Lautaro Martínez|DEL:Marcus Thuram|DEL:Pio Esposito",
+ juv:"DEF:Juan Cabal|MED:Teun Koopmeiners|DEL:Nick Woltemade|DEL:Randal Kolo Muani",
+ mil:"MED:Luka Modrić|MED:Adrien Rabiot|MED:Ardon Jashari|MED:Christian Pulisic|DEL:Gonçalo Ramos|DEL:Alphadjo Cissè",
+ com:"DEF:Jacobo Ramón|MED:Nico Paz|MED:Lucas Da Cunha|DEL:Tasos Douvikas",
+ bay:"DEF:Nathaniel Brown|MED:Joshua Kimmich|DEL:Michael Olise|DEL:Harry Kane",
+ bvb:"DEF:Waldemar Anton|MED:Felix Nmecha|DEL:Serhou Guirassy",
+ rbl:"DEF:Willi Orbán|DEF:David Raum|DEF:Ridle Baku|MED:Brajan Gruda|DEL:Antonio Nusa|DEL:Rômulo",
+ lev:"DEF:Miguel Gutiérrez|MED:Equi Fernández|DEL:Patrik Schick|DEL:Moreira",
+ psg:"DEF:Achraf Hakimi|DEF:Illia Zabarnyi|MED:Senny Mayulu|DEL:Désiré Doué|DEL:Ferran Torres",
+ lil:"DEL:Diaoune|DEL:Ngoy",
+ mon:"MED:Edan Diop|DEL:Paris Brunner",
+ om:"MED:Amine Harit|DEL:Amine Gouiri|DEL:Igor Paixão"
+};
+
+// Fichajes: k = "hecho" | "rumor"
+const TRANSFERS = [
+ {k:"hecho",p:"Enzo Fernández",f:"Chelsea",t:"Man City",fee:"145 M€",i:"El fichaje más caro del verano. Contrato hasta 2031.",s:"ClaroSports"},
+ {k:"hecho",p:"Morgan Rogers",f:"Aston Villa",t:"Chelsea",fee:"138 M€",i:"El fichaje más caro de la historia del Chelsea; contrato de seis años.",s:"SI, BBC"},
+ {k:"hecho",p:"Bradley Barcola",f:"PSG",t:"Liverpool",fee:"125 M€",i:"Fue cuarto en el Mundial con Francia, con tres goles.",s:"SI, Goal"},
+ {k:"hecho",p:"Yan Diomande",f:"Leipzig",t:"Real Madrid",fee:"125 M€",i:"El fichaje más caro de LaLiga este verano; según Marca, puede subir con variables.",s:"Infobae, Marca"},
+ {k:"hecho",p:"Anthony Gordon",f:"Newcastle",t:"Barcelona",fee:"70 + 10 M€",i:"Cinco temporadas de contrato.",s:"Infobae"},
+ {k:"hecho",p:"Rodri",f:"Man City",t:"Barcelona",fee:"60 M€",i:"",s:"TV Azteca, DAZN"},
+ {k:"hecho",p:"Marc Cucurella",f:"Chelsea",t:"Real Madrid",fee:"55 M€",i:"Refuerzo para el lateral izquierdo.",s:"DAZN"},
+ {k:"hecho",p:"Morten Hjulmand",f:"Sporting",t:"Atlético",fee:"40 M€",i:"Hasta 45 M€ con variables.",s:"DAZN"},
+ {k:"hecho",p:"Kang-in Lee",f:"PSG",t:"Atlético",fee:"40 M€",i:"",s:"TV Azteca"},
+ {k:"hecho",p:"Cristian Romero",f:"Tottenham",t:"Atlético",fee:"33 M€",i:"",s:"TV Azteca"},
+ {k:"hecho",p:"Karim Adeyemi",f:"Dortmund",t:"Barcelona",fee:"22 M€",i:"",s:"TV Azteca"},
+ {k:"hecho",p:"Álex Grimaldo",f:"Leverkusen",t:"Atlético",fee:"22 M€",i:"Ya lleva 4 goles en liga.",s:"TV Azteca"},
+ {k:"hecho",p:"Denzel Dumfries",f:"Inter",t:"Real Madrid",fee:"20 M€",i:"",s:"TV Azteca"},
+ {k:"hecho",p:"Bernardo Silva",f:"Man City",t:"Real Madrid",fee:"",i:"",s:"Infobae"},
+ {k:"hecho",p:"Jeremy Jacquet",f:"Rennes",t:"Liverpool",fee:"",i:"Central francés.",s:"DAZN"},
+ {k:"hecho",p:"Emiliano «Dibu» Martínez",f:"Aston Villa",t:"Chelsea",fee:"≈10 M$",i:"El Chelsea superó los 450 millones de dólares en fichajes.",s:"Infobae"},
+ {k:"hecho",p:"JJ Gabriel",f:"Man United",t:"Real Madrid",fee:"",i:"Ya se ha despedido del United; jugará en el Madrid desde enero.",s:"Fichajes.net"},
+ {k:"hecho",p:"Anai Morales",f:"Logroñés (cedido)",t:"Osasuna",fee:"Vuelta de cesión",i:"Vuelve a Tajonar tras Navidad después de marcar nueve goles en Primera Federación.",s:"FútbolFantasy"},
+ {k:"rumor",p:"Erling Haaland",f:"Man City",t:"Real Madrid",fee:"175 M€",i:"El City fija ese precio; el Madrid tendría ventaja sobre el Barça para el verano.",s:"SI"},
+ {k:"rumor",p:"Enzo Fernández",f:"Man City",t:"Real Madrid",fee:"",i:"El Madrid busca un centrocampista de renombre para 2027.",s:"SI"},
+ {k:"rumor",p:"Nico Paz",f:"Como",t:"Real Madrid",fee:"",i:"Se habla de que el Madrid necesita su vuelta.",s:"Fichajes.net"},
+ {k:"rumor",p:"Bart Verbruggen",f:"Brighton",t:"Real Madrid",fee:"",i:"Posible sucesor de Courtois.",s:"SI"},
+ {k:"rumor",p:"Alessandro Bastoni",f:"Inter",t:"Barcelona",fee:"",i:"El Barça busca un central para acompañar a Cubarsí. También suena Natan (Betis).",s:"SI"},
+ {k:"rumor",p:"Pedro Porro",f:"Tottenham",t:"Barcelona",fee:"",i:"Sport lo sitúa como prioridad para enero; otras fuentes lo descartan.",s:"Sport, M. Moretto"},
+ {k:"rumor",p:"Victor Osimhen",f:"Galatasaray",t:"Atlético",fee:"≈70 M€",i:"Petición de Simeone; el Atlético estudia rebajar el precio con variables.",s:"Fichajes.net"},
+ {k:"rumor",p:"Martín Zubimendi",f:"Arsenal",t:"Atlético",fee:"",i:"El Arsenal necesitaría vender en enero.",s:"SI"},
+ {k:"rumor",p:"Pio Esposito",f:"Inter",t:"Atlético",fee:"",i:"Atlético y Barcelona podrían pelear por él.",s:"SI"},
+ {k:"rumor",p:"Trent Alexander-Arnold",f:"Real Madrid",t:"Liverpool",fee:"Cesión",i:"Volver al Liverpool en enero sería su prioridad.",s:"SI"},
+ {k:"rumor",p:"Alejandro Balde",f:"Barcelona",t:"Roma o Man United",fee:"",i:"Se plantea salir en enero para tener minutos.",s:"SI"},
+ {k:"rumor",p:"Endrick",f:"Real Madrid",t:"Salida en enero",fee:"",i:"No la descarta, aunque quiere ganarse un sitio con Mourinho.",s:"AS"},
+ {k:"rumor",p:"Harry Maguire y Joshua Zirkzee",f:"Man United",t:"Salida",fee:"",i:"Pochettino prescindiría de ellos para hacer hueco.",s:"SI"}
+];
+
+/* ================== UTILIDADES ================== */
+const $ = s=>document.querySelector(s);
+const esc = s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const store = {
+  get(k,def){try{const v=localStorage.getItem(k);return v?JSON.parse(v):def}catch(e){return def}},
+  set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}
+};
+const DAYS=["domingo","lunes","martes","miércoles","jueves","viernes","sábado"];
+const MONTHS=["enero","febrero","marzo","abril","mayo","junio","julio","agosto","septiembre","octubre","noviembre","diciembre"];
+function dayLabel(d){const [y,m,dd]=d.split("-").map(Number);const dt=new Date(y,m-1,dd);const s=DAYS[dt.getDay()]+" "+dd+" de "+MONTHS[m-1];return s[0].toUpperCase()+s.slice(1)}
+function shortDay(d){const [y,m,dd]=d.split("-").map(Number);const dt=new Date(y,m-1,dd);return DAYS[dt.getDay()].slice(0,3)+" "+dd+"/"+m}
+const KIT={bar:["st","#004D98","#A50044"],osa:["hv","#D91A21","#0A1F44"],atm:["st","#FFFFFF","#CB3524"],rma:["ch","#FFFFFF","#C9A227"],liv:["so","#C8102E"],che:["so","#034694"],mci:["so","#6CABDD"],ars:["hv","#EF0107","#FFFFFF"],mun:["ch","#DA291C","#111111"],int:["st","#111111","#0068A8"],juv:["st","#FFFFFF","#111111"],mil:["st","#111111","#FB090B"],com:["so","#1B4E9B"],bay:["hv","#DC052D","#0066B2"],bvb:["ch","#FDE100","#111111"],rbl:["sa","#FFFFFF","#DD0741"],lev:["hv","#111111","#E32221"],psg:["bd","#004170","#DA291C"],lil:["ch","#E01E13","#14213D"],mon:["dg","#E7192E","#FFFFFF"],om:["ch","#FFFFFF","#2FAEE0"]};
+const SH="M2 1.5h20v11.5c0 7-4.6 11.2-10 13.5C6.6 24.2 2 20 2 13z";
+const RK={
+ "Athletic":["st","#FFFFFF","#E30613"],"Espanyol":["st","#FFFFFF","#0D4C9E"],"Alavés":["st","#FFFFFF","#0055A5"],"Deportivo":["st","#FFFFFF","#1D5DA8"],"Rayo":["sa","#FFFFFF","#E30613"],"Valencia":["ch","#FFFFFF","#111111"],"Sevilla":["ch","#FFFFFF","#D71920"],"Betis":["st","#FFFFFF","#00954C"],"Celta":["so","#8AC3EE"],"Villarreal":["ch","#FFE114","#005187"],"Racing":["ch","#FFFFFF","#00975F"],"Real Sociedad":["st","#FFFFFF","#0067B1"],"Málaga":["st","#FFFFFF","#3D8FD8"],"Getafe":["so","#005999"],"Levante":["st","#003E7E","#B3123B"],"Elche":["bh","#FFFFFF","#05642C"],
+ "Brighton":["st","#FFFFFF","#0057B8"],"Bournemouth":["st","#111111","#DA291C"],"Leeds":["ch","#FFFFFF","#FFCD00"],"Everton":["so","#003399"],"Tottenham":["ch","#FFFFFF","#132257"],"Brentford":["st","#FFFFFF","#E30613"],"Hull":["st","#F5A12D","#111111"],"Aston Villa":["hv","#670E36","#95BFE5"],"Newcastle":["st","#FFFFFF","#111111"],"Coventry":["so","#59CBE8"],"Fulham":["ch","#FFFFFF","#111111"],"Ipswich":["so","#0044A9"],"Nottingham":["ch","#DD0000","#FFFFFF"],"Sunderland":["st","#FFFFFF","#EB172B"],"Crystal Palace":["st","#1B458F","#C4122E"],
+ "Lazio":["so","#87D8F7"],"Roma":["ch","#8E1F2F","#F0BC42"],"Frosinone":["ch","#FFDD00","#0050A0"],"Nápoles":["so","#12A0D7"],"Bolonia":["hv","#A21C26","#1A2F48"],"Génova":["hv","#AE1919","#00244D"],"Cagliari":["hv","#B01028","#002350"],"Atalanta":["st","#1E71B8","#111111"],"Torino":["so","#8A1E03"],"Lecce":["st","#FFED00","#D2001F"],"Fiorentina":["so","#482E92"],"Parma":["ch","#FFFFFF","#FFD200"],"Sassuolo":["st","#00A752","#111111"],"Monza":["ch","#E2001A","#FFFFFF"],"Udinese":["st","#FFFFFF","#111111"],"Venezia":["ch","#111111","#F47C00"],
+ "Friburgo":["ch","#E2001A","#111111"],"Leverkusen":["hv","#111111","#E32221"],"Werder":["ch","#1D9053","#FFFFFF"],"Frankfurt":["ch","#111111","#E1000F"],"Stuttgart":["bh","#FFFFFF","#E32219"],"Elversberg":["hv","#111111","#FFFFFF"],"Augsburgo":["hv","#BA3733","#46714D"],"Hoffenheim":["so","#1C63B7"],"Hamburgo":["ch","#FFFFFF","#0A3F86"],"Maguncia":["so","#C3141E"],"Colonia":["dg","#FFFFFF","#ED1C24"],"Paderborn":["ch","#005CA9","#111111"],"Schalke":["bh","#004D9D","#FFFFFF"],"Union Berlin":["sa","#EB1923","#FFFFFF"],"Gladbach":["bh","#FFFFFF","#1D9053"],
+ "Osnabrück":["so","#6D2C91"],"Hertha":["st","#FFFFFF","#005CA9"],"Holstein Kiel":["ch","#005CA9","#E2001A"],"Braunschweig":["ch","#FFDD00","#1E3D7C"],"Magdeburgo":["so","#003F8A"],
+ "Paris FC":["ch","#1F2A44","#7FB5E0"],"Lyon":["bh","#FFFFFF","#DA001A"],"Brest":["ch","#E2001A","#FFFFFF"],"Niza":["st","#111111","#E2001A"],"Rennes":["ch","#E13327","#111111"],"Lorient":["so","#F37021"],"Lens":["hv","#FFD700","#E2001A"],"Toulouse":["so","#5B2C8E"],"Le Mans":["hv","#E2001A","#FFD700"],"Troyes":["so","#1E5CA8"],"Auxerre":["ch","#FFFFFF","#004E9F"],"Estrasburgo":["ch","#0055A4","#FFFFFF"],"Angers":["st","#FFFFFF","#111111"],"Le Havre":["hv","#1E3D7B","#80BFEA"],
+ "Brujas":["st","#111111","#0077C8"],"Sporting":["hp","#FFFFFF","#00875F"],"LASK":["st","#111111","#FFFFFF"],"Galatasaray":["hv","#FDB912","#A90432"],"Fenerbahçe":["st","#163962","#FFED00"],"Shakhtar":["st","#F37021","#111111"],"Viking":["so","#003DA5"],"PSV":["st","#FFFFFF","#E2001A"],"Bodø/Glimt":["so","#FFE500"],"Porto":["st","#FFFFFF","#005CA9"],"AEK":["ch","#FFDD00","#111111"],"Sabah":["so","#00953B"],"Feyenoord":["hv","#E2001A","#FFFFFF"],"Slavia Praga":["hv","#FFFFFF","#E2001A"],"Slovan":["so","#6CACE4"]
+};
+let CID=0;
+function crest(name,cls=""){
+  const t=BYNAME[name]; const [p,a,b]=t?KIT[t.id]:(RK[name]||["so","#B9A7A2"]); const id="cr"+(++CID);
+  let f=`<rect width="24" height="28" fill="${a}"/>`;
+  if(p==="st")for(let x=2;x<24;x+=6)f+=`<rect x="${x}" width="3" height="28" fill="${b}"/>`;
+  if(p==="hv")f+=`<rect x="12" width="12" height="28" fill="${b}"/>`;
+  if(p==="ch")f+=`<rect width="24" height="8" fill="${b}"/>`;
+  if(p==="sa")f+=`<path d="M-4 5L4-3L28 21L20 29z" fill="${b}"/>`;
+  if(p==="bd")f+=`<rect x="7" width="10" height="28" fill="#FFFFFF"/><rect x="8.5" width="7" height="28" fill="${b}"/>`;
+  if(p==="dg")f+=`<path d="M0 28L24 0V28z" fill="${b}"/>`;
+  if(p==="hp")for(let y=3;y<28;y+=6)f+=`<rect y="${y}" width="24" height="3" fill="${b}"/>`;
+  if(p==="bh")f+=`<rect y="10" width="24" height="6" fill="${b}"/>`;
+  return `<span class="crest ${cls}" aria-hidden="true"><svg viewBox="0 0 24 28"><defs><clipPath id="${id}"><path d="${SH}"/></clipPath></defs><g clip-path="url(#${id})">${f}</g><path d="${SH}" fill="none" stroke="rgba(0,0,0,.4)" stroke-width="1"/></svg></span>`;
+}
+function crestOld(name,cls=""){
+  const t=BYNAME[name];
+  const code2=t?({bar:"FCB",osa:"OSA",atm:"ATM",rma:"RMA",liv:"LIV",che:"CHE",mci:"MCI",ars:"ARS",mun:"MUN",int:"INT",juv:"JUV",mil:"MIL",com:"COM",bay:"BAY",bvb:"BVB",rbl:"RBL",wob:"WOB",psg:"PSG",lil:"LIL",mon:"ASM",om:"OM"}[t.id]):(name.slice(0,3).toUpperCase());
+  const color=t?t.c:"#9a8a86";
+  return `<span class="crest ${t&&t.lt?"light":""} ${cls}" style="--c:${color}" aria-hidden="true">${esc(code2)}</span>`;
+}
+function norm(m){return Array.isArray(m)?{h:m[0],a:m[1],hs:m[2],as:m[3],gh:m[4],ga:m[5]}:m}
+let FAVS=new Set(store.get("fat-favs",TEAMS.map(t=>t.n)));
+const isFav = n=>FAVS.has(n);
+const favList = ()=>[...TEAMS.map(t=>t.n).filter(n=>FAVS.has(n)),...[...FAVS].filter(n=>!BYNAME[n])];
+function leagueOf(n){return Object.keys(TABLES).find(k=>k!=="ucl"&&TABLES[k].rows.some(r=>r[0]===n))}
+function toggleFav(n){FAVS.has(n)?FAVS.delete(n):FAVS.add(n);store.set("fat-favs",[...FAVS]);renderAll()}
+
+/* ================== NAVEGACIÓN ================== */
+const VIEWS=["hoy","resultados","ligas","estadisticas","mi-once","fichajes"];
+function show(){
+  const v=VIEWS.includes(location.hash.slice(1))?location.hash.slice(1):"hoy";
+  document.querySelectorAll(".view").forEach(s=>s.classList.toggle("on",s.id==="v-"+v));
+  document.querySelectorAll(".tab").forEach(b=>{if(b.dataset.v===v)b.setAttribute("aria-current","page");else b.removeAttribute("aria-current")});
+}
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{location.hash=b.dataset.v;window.scrollTo(0,0)}));
+window.addEventListener("hashchange",show);
+
+/* ================== HOY ================== */
+function allMatches(){
+  const out=[];
+  for(const [ck,c] of Object.entries(COMPS)){
+    c.rounds.forEach((r,ri)=>r.matches.forEach(m=>{const x=norm(m);out.push({...x,comp:ck,round:r.label,date:x.d||r.date,ri})}));
+  }
+  return out;
+}
+const ALL=allMatches();
+function upcomingFav(){
+  return ALL.filter(m=>m.t&&(isFav(m.h)||isFav(m.a))).sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
+}
+function renderRail(){
+  const l=favList();
+  $("#rail").innerHTML=l.length?l.map(n=>`<button class="fav" data-team="${esc(n)}">${crest(n)}<span>${esc(n)}</span></button>`).join(""):`<p class="empty">No tienes favoritos. Pulsa «Editar favoritos» para elegirlos.</p>`;
+}
+function renderBoleto(){
+  const picks=store.get("mj-quiniela",{});
+  const ms=upcomingFav();
+  let html=`<div class="boleto-head"><b aria-hidden="true">Nº</b><b>Partido</b><div class="cols" aria-hidden="true"><span>1</span><span>X</span><span>2</span></div></div>`;
+  let lastDay="";
+  ms.forEach((m,i)=>{
+    if(m.d!==lastDay){html+=`<div class="day">${esc(dayLabel(m.d))}</div>`;lastDay=m.d}
+    const key=m.d+"|"+m.h+"|"+m.a;
+    const p=picks[key];
+    const tn=n=>`<span class="${isFav(n)?"is-fav":"not-fav"}">${esc(n)}</span>`;
+    html+=`<div class="qrow">
+      <span class="qn">${i+1}</span>
+      <div class="qm"><div class="teams">${tn(m.h)} – ${tn(m.a)}</div><div class="meta">${esc(m.t)} h, ${esc(COMPS[m.comp].name)} ${esc(m.round.replace("Jornada ","J").replace(" adelantada",""))}</div></div>
+      <div class="marks" role="group" aria-label="Pronóstico ${esc(m.h)} contra ${esc(m.a)}">
+        ${["1","X","2"].map(o=>`<button class="mark" data-key="${esc(key)}" data-o="${o}" aria-pressed="${p===o}">${o}</button>`).join("")}
+      </div></div>`;
+  });
+  const n=Object.keys(picks).filter(k=>ms.some(m=>(m.d+"|"+m.h+"|"+m.a)===k)).length;
+  html+=`<div class="boleto-foot"><span>${n} de ${ms.length} pronósticos marcados</span><button class="linkbtn" id="q-clear">Borrar quiniela</button></div>`;
+  $("#boleto").innerHTML=html;
+}
+$("#boleto").addEventListener("click",e=>{
+  const b=e.target.closest(".mark");
+  if(b){const picks=store.get("mj-quiniela",{});const k=b.dataset.key;picks[k]=picks[k]===b.dataset.o?undefined:b.dataset.o;if(!picks[k])delete picks[k];store.set("mj-quiniela",picks);renderBoleto();
+    const again=document.querySelector(`.mark[data-key="${CSS.escape(k)}"][data-o="${b.dataset.o}"]`);if(again)again.focus();return}
+  if(e.target.id==="q-clear"){store.set("mj-quiniela",{});renderBoleto()}
+});
+function matchRow(m,withComp){
+  const played=m.hs!==undefined;
+  const hw=played&&m.hs>m.as, aw=played&&m.as>m.hs;
+  const side=(n,cls,won)=>`<div class="t ${cls} ${isFav(n)?"fv":""} ${won?"won":""}">${cls==="h"?`${isFav(n)?'<span class="dot" aria-label="tu equipo"></span>':""}<span class="nm">${esc(n)}</span>${crest(n)}`:`${crest(n)}<span class="nm">${esc(n)}</span>${isFav(n)?'<span class="dot" aria-label="tu equipo"></span>':""}`}</div>`;
+  const center=played?`<span class="sc">${m.hs}–${m.as}</span>`:`<span class="sc pend">${esc(shortDay(m.d))}<br>${esc(m.t)}</span>`;
+  const tag=withComp?`<div class="comp-tag">${esc(COMPS[m.comp].name)}, ${esc(m.round.toLowerCase())}</div>`:"";
+  if(played&&(m.gh||m.ga)){
+    return `<details class="m">${tag?`<summary style="display:block;padding:0">${tag}<div class="row" style="display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;padding:8px 12px 10px">${side(m.h,"h",hw)}${center}${side(m.a,"a",aw)}</div></summary>`:`<summary>${side(m.h,"h",hw)}${center}${side(m.a,"a",aw)}</summary>`}<div class="goals"><div>${esc(m.gh||"")}</div><div>${esc(m.ga||"")}</div></div></details>`;
+  }
+  return `<div class="m">${tag}<div class="row">${side(m.h,"h",hw)}${center}${side(m.a,"a",aw)}</div></div>`;
+}
+function renderLast(){
+  // último partido jugado de cada favorito, sin duplicar
+  const seen=new Set(), rows=[];
+  favList().map(n=>({n})).forEach(t=>{
+    const m=ALL.filter(x=>x.hs!==undefined&&(x.h===t.n||x.a===t.n)&&x.comp!=="ucl").sort((a,b)=>b.date.localeCompare(a.date))[0];
+    if(m){const k=m.comp+m.round+m.h+m.a;if(!seen.has(k)){seen.add(k);rows.push(m)}}
+  });
+  $("#last").innerHTML=rows.map(m=>matchRow(m,true)).join("");
+}
+
+/* ================== FICHA DE EQUIPO ================== */
+function openTeam(name){
+  const t=BYNAME[name]||{n:name,lg:leagueOf(name)}; const d=$("#dlg-team");
+  let pos=null,row=null,tableName="";
+  if(TABLES[t.lg]){TABLES[t.lg].rows.forEach((r,i)=>{if(r[0]===t.n){pos=i+1;row=r}});tableName=COMPS[t.lg].name}
+  const uclRow=TABLES.ucl.rows.findIndex(r=>r[0]===t.n);
+  const played=ALL.filter(x=>x.hs!==undefined&&(x.h===t.n||x.a===t.n)).sort((a,b)=>b.date.localeCompare(a.date)).slice(0,5);
+  const next=ALL.filter(x=>x.t&&(x.h===t.n||x.a===t.n)).sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t));
+  const goals=[];Object.entries(SCORERS).forEach(([k,s])=>s.list.forEach(p=>{if(p[1]===t.n)goals.push([p[0],p[2],COMPS[k].name])}));
+  const tfs=TRANSFERS.filter(x=>x.f.includes(t.n)||x.t.includes(t.n));
+  const resLetter=m=>{const home=m.h===t.n;const gf=home?m.hs:m.as,ga=home?m.as:m.hs;return gf>ga?"W":gf<ga?"L":"D"};
+  const resTxt={W:"V",D:"E",L:"D"};
+  let kv="";
+  if(row){kv=`<div class="kv"><div><b>${pos}º</b><span>en ${esc(tableName)}</span></div><div><b>${row[7]}</b><span>puntos</span></div><div><b>${row[2]}-${row[3]}-${row[4]}</b><span>V-E-D</span></div></div>`}
+  d.innerHTML=`<div class="dlg-h">${crest(t.n,"lg")}<div><h2 id="dt-name">${esc(t.full||t.n)}</h2><p>${esc(t.lg?COMPS[t.lg].name:"Champions")}${t.coach?", entrenador: "+esc(t.coach):""}${uclRow>=0?", "+(uclRow+1)+"º en Champions":""}</p></div><button class="x" aria-label="Cerrar" data-close>×</button></div>
+  <div class="dlg-b">${kv}
+   <button class="btn ${isFav(t.n)?"ghost":""} favbtn" data-fav="${esc(t.n)}">${isFav(t.n)?"★ Quitar de favoritos":"☆ Añadir a favoritos"}</button>
+   <h3>Próximos partidos</h3>${next.length?next.map(m=>`<div class="mini"><span class="when">${esc(dayLabel(m.d))}, ${esc(m.t)} h, ${esc(COMPS[m.comp].name)}</span><span>${m.h===t.n?"🏠":"✈️"}</span><span>${esc(m.h===t.n?m.a:m.h)}</span><span></span></div>`).join(""):`<p class="note">Sin partidos programados en los datos actuales.</p>`}
+   <h3>Resultados recientes</h3>${played.map(m=>{const L=resLetter(m);return `<div class="mini"><span class="when">${esc(COMPS[m.comp].name)}, ${esc(m.round.toLowerCase())}</span><span class="res ${L}" aria-label="${L==="W"?"victoria":L==="L"?"derrota":"empate"}">${resTxt[L]}</span><span>${esc(m.h)} – ${esc(m.a)}</span><span class="s">${m.hs}–${m.as}</span></div>`}).join("")}
+   ${goals.length?`<h3>Goleadores destacados</h3>${goals.map(g=>`<div class="mini"><span>⚽</span><span>${esc(g[0])} <small style="color:var(--muted)">(${esc(g[2])})</small></span><span class="s">${g[1]}</span></div>`).join("")}`:""}
+   ${tfs.length?`<h3>Fichajes y rumores</h3>${tfs.map(x=>`<div class="mini"><span>${x.k==="hecho"?"✅":"💬"}</span><span>${esc(x.p)}: ${esc(x.f)} → ${esc(x.t)}</span><span class="s">${esc(x.fee||"")}</span></div>`).join("")}`:""}
+  </div>`;
+  d.showModal();
+}
+document.addEventListener("click",e=>{
+  const fv=e.target.closest("[data-fav]"); if(fv){toggleFav(fv.dataset.fav);openTeam(fv.dataset.fav);return}
+  const f=e.target.closest("[data-team]"); if(f){openTeam(f.dataset.team);return}
+  if(e.target.closest("[data-close]")){e.target.closest("dialog").close()}
+});
+document.querySelectorAll("dialog").forEach(d=>d.addEventListener("click",e=>{if(e.target===d)d.close()}));
+
+/* ================== RESULTADOS ================== */
+let resComp="laliga", resRound=null;
+const RES_ORDER=["laliga","premier","seriea","bundes","ligue1","ucl"];
+function renderResComp(){
+  $("#res-comp").innerHTML=RES_ORDER.map(k=>`<button class="pill" data-c="${k}" aria-pressed="${k===resComp}">${COMPS[k].flag} ${esc(COMPS[k].name)}</button>`).join("");
+}
+function defaultRound(k){const rs=COMPS[k].rounds;let i=rs.findIndex(r=>r.up);return i<=0?0:i-1}
+function renderRes(){
+  const c=COMPS[resComp]; if(resRound===null)resRound=defaultRound(resComp);
+  $("#res-round").innerHTML=c.rounds.map((r,i)=>`<button class="pill" data-r="${i}" aria-pressed="${i===resRound}">${esc(r.label)}${r.up?" (próxima)":""}</button>`).join("");
+  const r=c.rounds[resRound];
+  $("#res-list").innerHTML=r.matches.map(m=>matchRow({...norm(m),d:norm(m).d||r.date,comp:resComp,round:r.label})).join("");
+  $("#res-note").textContent=r.note||"";
+}
+$("#res-comp").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b)return;resComp=b.dataset.c;resRound=null;renderResComp();renderRes()});
+$("#res-round").addEventListener("click",e=>{const b=e.target.closest("[data-r]");if(!b)return;resRound=+b.dataset.r;renderRes()});
+
+/* ================== LIGAS ================== */
+let ligComp="laliga";
+const LIG_ORDER=["laliga","premier","seriea","bundes","ligue1","ucl"];
+function renderLig(){
+  $("#lig-comp").innerHTML=LIG_ORDER.map(k=>`<button class="pill" data-c="${k}" aria-pressed="${k===ligComp}">${COMPS[k].flag} ${esc(COMPS[k].country)}</button>`).join("");
+  const T=TABLES[ligComp], z=T.zones;
+  const zone=i=>{const p=i+1;if(T.ucl){if(p<=8)return"z-ucl";if(p<=24)return"z-uel";return"z-rel"}if(p<=z.ucl)return"z-ucl";if(z.ucq&&p<=z.ucq)return"z-ucl";if(p<=z.uel)return"z-uel";if(p>=z.rel)return"z-rel";return""};
+  let html;
+  if(T.ucl){
+    html=`<thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>DG</th><th>Pts</th></tr></thead><tbody>`+
+    T.rows.map((r,i)=>`<tr class="${zone(i)} ${isFav(r[0])?"mine":""}"><td>${i+1}</td><td><button class="tcell tname" data-team="${esc(r[0])}">${crest(r[0])}${esc(r[0])}</button></td><td>${r[1]}</td><td>${esc(r[2]||"–")}</td><td class="pts">${r[3]}</td></tr>`).join("")+`</tbody>`;
+  }else{
+    html=`<thead><tr><th>#</th><th>Equipo</th><th>PJ</th><th>G</th><th>E</th><th>P</th><th>GF</th><th>GC</th><th>DG</th><th>Pts</th></tr></thead><tbody>`+
+    T.rows.map((r,i)=>{const dg=r[5]-r[6];return `<tr class="${zone(i)} ${isFav(r[0])?"mine":""}"><td>${i+1}</td><td><button class="tcell tname" data-team="${esc(r[0])}">${crest(r[0])}${esc(r[0])}</button></td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td><td>${r[4]}</td><td>${r[5]}</td><td>${r[6]}</td><td>${dg>0?"+"+dg:dg===0?"0":"−"+Math.abs(dg)}</td><td class="pts">${r[7]}</td></tr>`}).join("")+`</tbody>`;
+  }
+  $("#lig-tbl").innerHTML=html;
+  $("#lig-legend").innerHTML=T.ucl?
+    `<span><i style="background:var(--green)"></i>Octavos directos</span><span><i style="background:var(--gold)"></i>Eliminatoria previa</span><span><i style="background:var(--red)"></i>Eliminados</span>`:
+    `<span><i style="background:var(--green)"></i>Champions</span><span><i style="background:var(--gold)"></i>Europa League y Conference</span><span><i style="background:var(--red)"></i>Descenso</span>`;
+  $("#lig-note").textContent=T.note||"";
+}
+$("#lig-comp").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b)return;ligComp=b.dataset.c;renderLig()});
+
+/* ================== ESTADÍSTICAS ================== */
+let stComp="laliga";
+function renderSt(){
+  const order=["laliga","premier","seriea","bundes","ligue1"];
+  $("#st-comp").innerHTML=order.map(k=>`<button class="pill" data-c="${k}" aria-pressed="${k===stComp}">${COMPS[k].flag} ${esc(COMPS[k].name)}</button>`).join("");
+  const S=SCORERS[stComp], only=$("#st-only").checked;
+  const max=Math.max(...S.list.map(p=>p[2]));
+  const rows=S.list.map((p,i)=>({p,i})).filter(o=>!only||isFav(o.p[1]));
+  $("#st-list").innerHTML=`<p class="note" style="margin:6px 14px 4px">${esc(S.label)}</p>`+(rows.length?rows.map(({p,i})=>`<div class="sr ${isFav(p[1])?"fv":""}"><span class="pos">${i+1}</span><div class="who"><b>${esc(p[0])}</b><small>${esc(p[1])}</small><div class="bar"><i style="width:${Math.round(p[2]/max*100)}%"></i></div></div><span class="g">${p[2]}</span></div>`).join(""):`<p class="empty">Ningún jugador de tus equipos está entre los máximos goleadores de esta liga ahora mismo.</p>`);
+  $("#st-facts").innerHTML=S.facts.map(f=>`<div class="fact"><b>${esc(f[0])}</b><span>${esc(f[1])}</span></div>`).join("");
+}
+$("#st-comp").addEventListener("click",e=>{const b=e.target.closest("[data-c]");if(!b)return;stComp=b.dataset.c;renderSt()});
+$("#st-only").addEventListener("change",renderSt);
+
+/* ================== MI ONCE ================== */
+const FORMS={
+ "4-3-3":[["POR",50,91],["DEF",14,72],["DEF",37,76],["DEF",63,76],["DEF",86,72],["MED",27,52],["MED",50,56],["MED",73,52],["DEL",18,26],["DEL",50,19],["DEL",82,26]],
+ "4-4-2":[["POR",50,91],["DEF",14,72],["DEF",37,76],["DEF",63,76],["DEF",86,72],["MED",14,48],["MED",37,52],["MED",63,52],["MED",86,48],["DEL",36,22],["DEL",64,22]],
+ "4-2-3-1":[["POR",50,91],["DEF",14,74],["DEF",37,78],["DEF",63,78],["DEF",86,74],["MED",35,59],["MED",65,59],["MED",16,37],["MED",50,40],["MED",84,37],["DEL",50,17]],
+ "3-5-2":[["POR",50,91],["DEF",25,75],["DEF",50,78],["DEF",75,75],["MED",11,49],["MED",31,55],["MED",50,45],["MED",69,55],["MED",89,49],["DEL",36,21],["DEL",64,21]]
+};
+const PLAYERS=[];
+Object.entries(POOL).forEach(([tid,s])=>s.split("|").forEach(x=>{const [p,n]=x.split(":");PLAYERS.push({n,p,tid})}));
+let once=store.get("mj-once",null)||{name:"Mi once",form:"4-3-3",slots:{},cap:null};
+let pickSlot=null;
+function saveOnce(){store.set("mj-once",once)}
+function initials(n){return n.split(/\s+/).filter(Boolean).map(w=>w[0]).join("").slice(0,3).toUpperCase()}
+function surname(n){const p=n.split(" ");return p.length>1?p.slice(1).join(" "):n}
+function renderOnce(){
+  $("#once-name").value=once.name; $("#once-form").value=once.form;
+  const F=FORMS[once.form];
+  const pitch=$("#pitch"); pitch.querySelectorAll(".slot").forEach(s=>s.remove());
+  F.forEach(([role,x,y],i)=>{
+    const pl=once.slots[i]; const t=pl&&pl.tid?TEAM(pl.tid):null;
+    const b=document.createElement("button");
+    b.className="slot"+(pl?" filled":""); b.style.left=x+"%"; b.style.top=y+"%";
+    b.setAttribute("aria-label",pl?`${role}: ${pl.n}. Cambiar`:`Elegir ${role}`);
+    b.innerHTML=`<span class="shirt ${t&&t.lt?"light":""}" style="${t?"--c:"+t.c:"--c:#555"}">${pl?esc(initials(pl.n)):esc(role)}</span>${once.cap===i&&pl?'<span class="cap" aria-hidden="true">C</span>':""}<span class="lbl">${pl?esc(surname(pl.n)):"+"}</span>`;
+    b.addEventListener("click",()=>openPick(i,role));
+    pitch.appendChild(b);
+  });
+  const filled=F.map((f,i)=>[f[0],once.slots[i],i]);
+  $("#roster").innerHTML=filled.map(([r,pl,i])=>`<li><span class="r">${r}</span><span>${pl?esc(pl.n)+(pl.tid?` <small style="color:var(--muted)">(${esc(TEAM(pl.tid).n)})</small>`:""):'<span style="color:var(--muted)">Sin elegir</span>'}</span>${pl?`<button class="linkbtn" data-cap="${i}" aria-pressed="${once.cap===i}">${once.cap===i?"Capitán":"Hacer capitán"}</button>`:"<span></span>"}</li>`).join("");
+  const n=Object.keys(once.slots).filter(k=>k<F.length&&once.slots[k]).length;
+  $("#once-count").textContent=n===11?"Once completo.":`Llevas ${n} de 11 jugadores.`;
+}
+$("#roster").addEventListener("click",e=>{const b=e.target.closest("[data-cap]");if(!b)return;const i=+b.dataset.cap;once.cap=once.cap===i?null:i;saveOnce();renderOnce()});
+$("#once-name").addEventListener("input",e=>{once.name=e.target.value;saveOnce()});
+$("#once-form").addEventListener("change",e=>{once.form=e.target.value;
+  // mantener jugadores por rol en el nuevo sistema
+  const old=Object.values(once.slots).filter(Boolean); const F=FORMS[once.form]; const ns={};
+  F.forEach(([r],i)=>{const k=old.findIndex(p=>p.p===r);if(k>=0){ns[i]=old.splice(k,1)[0]}});
+  F.forEach(([r],i)=>{if(!ns[i]&&old.length){ns[i]=old.shift()}});
+  once.slots=ns; once.cap=null; saveOnce(); renderOnce()});
+$("#once-clear").addEventListener("click",()=>{once.slots={};once.cap=null;saveOnce();renderOnce()});
+
+let pickRole="POR", pickTeam="", pickQ="", pickAll=false;
+function openPick(i,role){pickSlot=i;pickRole=role;pickAll=false;pickQ="";
+  const d=$("#dlg-pick");
+  d.innerHTML=`<div class="dlg-h"><div><h2 id="dp-title">Elige ${esc({POR:"portero",DEF:"defensa",MED:"centrocampista",DEL:"delantero"}[role])}</h2><p>Jugadores de tus equipos</p></div><button class="x" aria-label="Cerrar" data-close>×</button></div>
+  <div class="dlg-b">
+   <div class="pick-tools"><input type="search" id="pk-q" placeholder="Buscar jugador" aria-label="Buscar jugador"><select class="sel" id="pk-team" aria-label="Equipo"><option value="">Todos mis equipos</option>${TEAMS.filter(t=>isFav(t.n)&&POOL[t.id]).map(t=>`<option value="${t.id}" ${pickTeam===t.id?"selected":""}>${esc(t.n)}</option>`).join("")}</select></div>
+   <label class="toggle"><input type="checkbox" id="pk-all"> Ver todas las posiciones</label>
+   <ul class="plist" id="pk-list"></ul>
+   <div class="custom"><input type="text" id="pk-custom" placeholder="O escribe otro nombre" aria-label="Otro jugador" maxlength="40"><button class="btn" id="pk-add">Colocar</button></div>
+   ${once.slots[i]?'<p style="margin:12px 0 0"><button class="linkbtn" id="pk-remove">Quitar jugador de esta posición</button></p>':""}
+  </div>`;
+  d.showModal(); renderPick();
+  $("#pk-q").addEventListener("input",e=>{pickQ=e.target.value;renderPick()});
+  $("#pk-team").addEventListener("change",e=>{pickTeam=e.target.value;renderPick()});
+  $("#pk-all").addEventListener("change",e=>{pickAll=e.target.checked;renderPick()});
+  $("#pk-add").addEventListener("click",()=>{const v=$("#pk-custom").value.trim();if(!v)return;place({n:v,p:pickRole,tid:null})});
+  $("#pk-custom").addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();$("#pk-add").click()}});
+  const rm=$("#pk-remove");if(rm)rm.addEventListener("click",()=>{delete once.slots[pickSlot];if(once.cap===pickSlot)once.cap=null;saveOnce();renderOnce();d.close()});
+}
+function renderPick(){
+  const used=new Set(Object.values(once.slots).filter(Boolean).map(p=>p.n));
+  const q=pickQ.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu,"");
+  const list=PLAYERS.filter(p=>isFav(TEAM(p.tid).n)&&(pickAll||p.p===pickRole)&&(!pickTeam||p.tid===pickTeam)&&(!q||p.n.toLowerCase().normalize("NFD").replace(/\p{Diacritic}/gu,"").includes(q)));
+  $("#pk-list").innerHTML=list.length?list.map((p,k)=>{const t=TEAM(p.tid);return `<li><button data-k="${PLAYERS.indexOf(p)}" ${used.has(p.n)?'aria-disabled="true" style="opacity:.45"':""}>${crest(t.n)}<span>${esc(p.n)}<br><small>${esc(t.n)}</small></span><small>${p.p}${used.has(p.n)?", ya está":""}</small></button></li>`}).join(""):`<li class="empty">No hay jugadores con ese filtro. Prueba con «Ver todas las posiciones» o escribe el nombre abajo.</li>`;
+}
+document.addEventListener("click",e=>{const b=e.target.closest("#pk-list button[data-k]");if(!b||b.getAttribute("aria-disabled"))return;place(PLAYERS[+b.dataset.k])});
+function place(pl){once.slots[pickSlot]={n:pl.n,p:pl.p,tid:pl.tid};saveOnce();renderOnce();$("#dlg-pick").close()}
+
+/* ================== FICHAJES ================== */
+let fiKind="todos";
+function renderFi(){
+  $("#fi-kind").innerHTML=[["todos","Todos"],["hecho","Cerrados"],["rumor","Rumores"]].map(([k,l])=>`<button class="pill" data-k="${k}" aria-pressed="${k===fiKind}">${l}</button>`).join("");
+  const sel=$("#fi-team"); const keep=sel.value; sel.innerHTML=`<option value="">Todos los equipos</option>`+favList().map(n=>`<option value="${esc(n)}">${esc(n)}</option>`).join(""); sel.value=favList().includes(keep)?keep:"";
+  const tm=sel.value;
+  const list=TRANSFERS.filter(x=>(fiKind==="todos"||x.k===fiKind)&&(!tm||x.f.includes(tm)||x.t.includes(tm)));
+  $("#fi-list").innerHTML=list.length?list.map(x=>`<article class="tcard ${x.k==="rumor"?"rumor":""}">
+    <div class="pl">${esc(x.p)}<span class="badge">${x.k==="hecho"?"Cerrado":"Rumor"}</span></div>
+    <div class="fee">${esc(x.fee||"")}</div>
+    <div class="route"><b>${esc(x.f)}</b> → <b>${esc(x.t)}</b></div>
+    <div class="info">${x.i?esc(x.i)+" ":""}Fuente: ${esc(x.s)}.</div>
+  </article>`).join(""):`<p class="empty">No hay movimientos con ese filtro.</p>`;
+}
+$("#fi-kind").addEventListener("click",e=>{const b=e.target.closest("[data-k]");if(!b)return;fiKind=b.dataset.k;renderFi()});
+$("#fi-team").addEventListener("change",renderFi);
+
+/* ================== PRÓXIMO PARTIDO ================== */
+const kick=m=>new Date(m.d+"T"+m.t+":00+01:00");
+let nextTimer=null;
+function renderNext(){
+  const now=new Date();
+  const m=upcomingFav().find(x=>kick(x)>now);
+  if(!m){$("#next").innerHTML=`<p class="empty">No quedan partidos de tus equipos en los datos guardados. Pídele a Claude que actualice la app con las nuevas jornadas.</p>`;return}
+  const ms=kick(m)-now, dd=Math.floor(ms/864e5), hh=Math.floor(ms%864e5/36e5), mm=Math.floor(ms%36e5/6e4);
+  const cd=dd>0?`${dd} d ${hh} h`:`${hh} h ${String(mm).padStart(2,"0")} min`;
+  $("#next").innerHTML=`<div class="next">
+    <button class="side-t tname" data-team="${esc(m.h)}">${crest(m.h)}${esc(m.h)}</button>
+    <div class="mid"><div class="cd">${cd}<small>para el pitido inicial</small></div><div class="when">${esc(dayLabel(m.d))}, ${esc(m.t)} h<br>${esc(COMPS[m.comp].name)}, ${esc(m.round.toLowerCase())}</div></div>
+    <button class="side-t tname" data-team="${esc(m.a)}">${crest(m.a)}${esc(m.a)}</button></div>`;
+}
+
+/* ================== EDITAR FAVORITOS ================== */
+function openFavs(){
+  const d=$("#dlg-favs");
+  const groups=["laliga","premier","seriea","bundes","ligue1"].map(k=>`<h3>${COMPS[k].flag} ${esc(COMPS[k].name)}</h3><div class="fgrid">${TABLES[k].rows.map(r=>`<label><input type="checkbox" data-fv="${esc(r[0])}" ${isFav(r[0])?"checked":""}>${crest(r[0])}${esc(r[0])}</label>`).join("")}</div>`).join("");
+  d.innerHTML=`<div class="dlg-h"><div><h2 id="df-title">Mis favoritos</h2><p>${FAVS.size} equipos marcados</p></div><button class="x" aria-label="Cerrar" data-close>×</button></div><div class="dlg-b">${groups}</div>`;
+  d.showModal();
+}
+$("#edit-favs").addEventListener("click",openFavs);
+$("#dlg-favs").addEventListener("change",e=>{const c=e.target.closest("[data-fv]");if(!c)return;const n=c.dataset.fv;if(c.checked)FAVS.add(n);else FAVS.delete(n);store.set("fat-favs",[...FAVS]);renderAll();$("#dlg-favs p").textContent=FAVS.size+" equipos marcados"});
+
+/* ================== TEMA ================== */
+function applyTheme(t){if(t)document.documentElement.dataset.theme=t;else delete document.documentElement.dataset.theme;
+  const dark=t?t==="dark":matchMedia("(prefers-color-scheme: dark)").matches; $("#theme").textContent=dark?"☀️":"🌙"}
+applyTheme(store.get("fat-theme",null));
+$("#theme").addEventListener("click",()=>{const cur=document.documentElement.dataset.theme||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");const nt=cur==="dark"?"light":"dark";store.set("fat-theme",nt);applyTheme(nt)});
+
+/* ================== INICIO ================== */
+function renderAll(){renderRail(); renderNext(); renderBoleto(); renderLast(); renderRes(); renderLig(); renderSt(); renderOnce(); renderFi()}
+renderResComp(); renderAll();
+nextTimer=setInterval(renderNext,30000);
+show();
+</script>
+</body>
+</html>
